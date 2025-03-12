@@ -12,7 +12,6 @@ def decode_image(image_str):
         return base64.b64decode(image_str)
     return None
 
-# Session state initialization
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'username' not in st.session_state:
