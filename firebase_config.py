@@ -1,7 +1,10 @@
+# firebase_config.py
+import json
 import firebase_admin
 from firebase_admin import credentials, firestore
 import streamlit as st
 
-cred = credentials.Certificate(st.secrets["firebase"]["firebase_service_account"])
+cert_json = json.loads(st.secrets["firebase"]["firebase_service_account"])
+cred = credentials.Certificate(cert_json)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
