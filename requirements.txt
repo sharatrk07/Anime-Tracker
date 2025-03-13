@@ -1,3 +1,4 @@
+setuptools>=67.0.0
 altair==5.4.1
 attrs==25.2.0
 blinker==1.8.2
@@ -34,7 +35,7 @@ MarkupSafe==2.1.5
 mdurl==0.1.2
 msgpack==1.1.0
 narwhals==1.30.0
-numpy==1.24.4
+numpy==1.25.2
 packaging==24.2
 pandas==2.0.3
 pillow==10.4.0
