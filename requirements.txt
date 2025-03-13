@@ -1,6 +1,5 @@
 setuptools>=67.0.0
 wheel
-setuptools-distutils==0.0.3
 altair==5.4.1
 attrs==25.2.0
 blinker==1.8.2
