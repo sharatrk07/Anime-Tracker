@@ -1,16 +1,6 @@
 import streamlit as st
 from firebase_config import db
-import base64
-
-def encode_image(uploaded_file):
-    if uploaded_file is not None:
-        return base64.b64encode(uploaded_file.getvalue()).decode('utf-8')
-    return ""
-
-def decode_image(image_str):
-    if image_str:
-        return base64.b64decode(image_str)
-    return None
+from PIL import Image
 
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
@@ -48,23 +38,31 @@ st.markdown("""
     --error: #CF6679;
     --text: #FFFFFF;
     --border: #2D2D2D;
-    --primary-font: #F5F5F5;
-    --category-font: #FFDD55;
-    --anime-title: #FF80AB;
-    --button-bg: #BB86FC;
-    --button-text: #121212;
-    --button-hover: #9966CC;
+    --login-title-color: #FF5733;
+    --tracker-title-color: #FFD700;
+    --watching-color: #4CAF50;
+    --finished-color: #2196F3;
+    --upcoming-color: #FF9800;
 }
 .stApp { background-color: var(--background); color: var(--text); }
-h1 { color: var(--primary-font); font-weight: 600; margin-bottom: 10px; text-align: center; }
-h2 { color: var(--primary-font); }
-h3 { color: var(--anime-title); }
+h1.login-title { color: var(--login-title-color); text-align: center; }
+h1.tracker-title { color: var(--tracker-title-color); text-align: center; }
+h2.category-title { color: #FF80AB; }
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+}
+.status-watching { background-color: var(--watching-color); }
+.status-finished { background-color: var(--finished-color); }
+.status-upcoming { background-color: var(--upcoming-color); }
 .section-header {
     border-left: 4px solid var(--primary);
     padding: 10px;
     margin: 20px 0 10px 0;
     font-size: 1.8rem;
-    color: var(--category-font);
     background-color: rgba(255, 221, 85, 0.1);
     border-radius: 4px;
 }
@@ -83,35 +81,27 @@ h3 { color: var(--anime-title); }
 .progress-low { background-color: var(--error); }
 .progress-medium { background-color: #FFAB40; }
 .progress-high { background-color: var(--secondary); }
-.status-badge {
-    padding: 4px 8px;
-    border-radius: 16px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text);
-}
-.status-watching { background-color: var(--primary); }
-.status-finished { background-color: var(--secondary); }
-.status-upcoming { background-color: #FFAB40; }
 .user-info {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    text-align: right;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: var(--card-bg);
     padding: 10px;
     border: 1px solid var(--border);
     border-radius: 8px;
+    position: fixed;
+    top: 10px;
+    right: 10px;
 }
 .stButton>button, .stFormSubmit>button {
-    background-color: var(--button-bg);
-    color: var(--button-text);
+    background-color: var(--primary);
+    color: var(--text);
     font-weight: bold;
     border: none;
     transition: background-color 0.3s;
 }
 .stButton>button:hover, .stFormSubmit>button:hover {
-    background-color: var(--button-hover);
+    background-color: var(--secondary);
 }
 hr {
     border: 0;
@@ -122,29 +112,12 @@ hr {
 </style>
 """, unsafe_allow_html=True)
 
-def load_anime_collection():
-    if st.session_state.username:
-        doc_ref = db.collection("users").document(st.session_state.username)
-        doc = doc_ref.get()
-        if doc.exists:
-            st.session_state.anime_collection = doc.to_dict().get("anime_collection", [])
-        else:
-            st.session_state.anime_collection = [
-                {'anime_name': 'Attack on Titan', 'seasons': 4, 'total_episodes': 87, 'finished_episodes': 87, 'image': ""},
-                {'anime_name': 'My Hero Academia', 'seasons': 6, 'total_episodes': 138, 'finished_episodes': 75, 'image': ""},
-                {'anime_name': 'Demon Slayer', 'seasons': 3, 'total_episodes': 55, 'finished_episodes': 55, 'image': ""}
-            ]
-            save_anime_collection()
-
-def save_anime_collection():
-    if st.session_state.username:
-        doc_ref = db.collection("users").document(st.session_state.username)
-        doc_ref.set({"anime_collection": st.session_state.anime_collection})
-
-def calculate_progress(anime):
-    if anime['total_episodes'] == 0:
-        return 0
-    return int((anime['finished_episodes'] / anime['total_episodes']) * 100)
+def filter_anime_collection():
+    filtered = []
+    for idx, anime in enumerate(st.session_state.anime_collection):
+        if not st.session_state.search_query or st.session_state.search_query.lower() in anime['anime_name'].lower():
+            filtered.append((idx, anime))
+    return filtered
 
 def get_status(anime):
     if anime['finished_episodes'] == 0:
@@ -153,6 +126,30 @@ def get_status(anime):
         return "finished"
     else:
         return "watching"
+
+def calculate_progress(anime):
+    if anime['total_episodes'] == 0:
+        return 0
+    return int((anime['finished_episodes'] / anime['total_episodes']) * 100)
+
+def load_anime_collection():
+    if st.session_state.username:
+        doc_ref = db.collection("users").document(st.session_state.username)
+        doc = doc_ref.get()
+        if hasattr(doc, 'exists') and doc.exists:
+            st.session_state.anime_collection = doc.to_dict().get("anime_collection", [])
+        else:
+            st.session_state.anime_collection = [
+                {'anime_name': 'Attack on Titan', 'seasons': 4, 'total_episodes': 87, 'finished_episodes': 87, 'image': None},
+                {'anime_name': 'My Hero Academia', 'seasons': 6, 'total_episodes': 138, 'finished_episodes': 75, 'image': None},
+                {'anime_name': 'Demon Slayer', 'seasons': 3, 'total_episodes': 55, 'finished_episodes': 55, 'image': None}
+            ]
+            save_anime_collection()
+
+def save_anime_collection():
+    if st.session_state.username:
+        doc_ref = db.collection("users").document(st.session_state.username)
+        doc_ref.set({"anime_collection": st.session_state.anime_collection})
 
 def save_anime_data(anime_data, edit_index=None):
     if edit_index is not None:
@@ -168,13 +165,6 @@ def delete_anime(index):
     save_anime_collection()
     st.session_state.view = 'home'
 
-def filter_anime_collection():
-    filtered = st.session_state.anime_collection
-    if st.session_state.search_query:
-        query = st.session_state.search_query.lower()
-        filtered = [anime for anime in filtered if query in anime['anime_name'].lower()]
-    return filtered
-
 def logout():
     st.session_state.logged_in = False
     st.session_state.username = ""
@@ -186,7 +176,7 @@ def logout():
 
 def auth_page():
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<h1 style='text-align:center;'>Welcome to the Anime Tracker</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='login-title'>Welcome to the Anime Tracker</h1>", unsafe_allow_html=True)
     cols = st.columns(2)
     if cols[0].button("Login"):
         st.session_state.auth_mode = "login"
@@ -219,8 +209,8 @@ def auth_page():
                 st.error("Invalid credentials")
 
 def display_home_view():
-    collection = filter_anime_collection()
-    if not collection:
+    filtered = filter_anime_collection()
+    if not filtered:
         st.markdown("""
         <div style="text-align:left; padding:20px; background-color: var(--card-bg); border-radius:8px;">
             <h2 class="section-header">Your collection is empty</h2>
@@ -229,17 +219,17 @@ def display_home_view():
         """, unsafe_allow_html=True)
     else:
         categories = [
-            ("Currently Watching", [a for a in collection if get_status(a) == "watching"]),
-            ("Finished", [a for a in collection if get_status(a) == "finished"]),
-            ("Upcoming", [a for a in collection if get_status(a) == "upcoming"])
+            ("Currently Watching", [pair for pair in filtered if get_status(pair[1]) == "watching"]),
+            ("Finished", [pair for pair in filtered if get_status(pair[1]) == "finished"]),
+            ("Upcoming", [pair for pair in filtered if get_status(pair[1]) == "upcoming"])
         ]
         for cat_name, anime_list in categories:
             if anime_list:
-                st.markdown(f'<h2 class="section-header">{cat_name}</h2>', unsafe_allow_html=True)
+                st.markdown(f"<h2 class='category-title' style='color: #FF80AB;'>{cat_name}</h2>", unsafe_allow_html=True)
                 display_anime_list(anime_list, cat_name.lower().replace(" ", "_"))
 
 def display_anime_list(anime_list, prefix):
-    for i, anime in enumerate(anime_list):
+    for orig_index, anime in anime_list:
         progress = calculate_progress(anime)
         progress_class = "progress-low" if progress < 33 else "progress-medium" if progress < 66 else "progress-high"
         status = get_status(anime)
@@ -249,54 +239,53 @@ def display_anime_list(anime_list, prefix):
             col_img, col_info = st.columns([1, 3])
             with col_img:
                 if anime.get('image'):
-                    st.image(decode_image(anime.get('image')), use_container_width=True)
+                    st.image(anime['image'], use_container_width=True)
                 else:
                     st.write("")
             with col_info:
                 st.markdown(f"""
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 style="color: var(--anime-title); margin: 0;">{anime['anime_name']}</h3>
+                    <h3 style="color: #FFD700;">{anime['anime_name']}</h3>
                     <span class="status-badge {status_class}">{status_text}</span>
                 </div>
                 """, unsafe_allow_html=True)
-                st.markdown(f"<p style='text-align:left;'>Seasons: {anime['seasons']}</p>", unsafe_allow_html=True)
-                col_left, col_right = st.columns([5, 2])
-                with col_left:
-                    st.markdown(f"<p style='text-align:left;'>Episodes: {anime['finished_episodes']} / {anime['total_episodes']}</p>", unsafe_allow_html=True)
-                with col_right:
-                    if st.button("✏️ Edit Watched", key=f"{prefix}_editwatched_{i}"):
-                        st.session_state.edit_watched_index = i
-                        st.session_state.view = 'edit_watched'
-                    if st.button("🖊️ Edit Details", key=f"{prefix}_edit_{i}"):
-                        st.session_state.edit_index = i
+                st.markdown(f"<p style='text-align:left; color: #FF80AB;'>Seasons: {anime['seasons']}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p style='text-align:left; color: #FF80AB;'>Episodes: {anime['finished_episodes']} / {anime['total_episodes']}</p>", unsafe_allow_html=True)
+                st.markdown(f"""
+                <div class="progress-container">
+                    <div class="progress-bar {progress_class}" style="width: {progress}%;"></div>
+                </div>
+                <p style="text-align:center; color: #FF80AB;">{progress}% complete</p>
+                """, unsafe_allow_html=True)
+                side_cols = st.columns([1, 1])
+                with side_cols[0]:
+                    if st.button("🖊️ Edit Details", key=f"{prefix}_edit_{orig_index}"):
+                        st.session_state.edit_index = orig_index
                         st.session_state.view = 'add'
-            st.markdown(f"""
-            <div class="progress-container">
-                <div class="progress-bar {progress_class}" style="width: {progress}%;"></div>
-            </div>
-            <p style="text-align:right;">{progress}% complete</p>
-            """, unsafe_allow_html=True)
+                with side_cols[1]:
+                    if st.button("🗑️ Delete Anime", key=f"{prefix}_delete_{orig_index}"):
+                        delete_anime(orig_index)
         st.markdown("---")
 
 def display_add_view():
     is_edit = st.session_state.edit_index is not None
     if is_edit:
-        st.markdown('<h2 class="section-header" style="text-align:center;">Edit Anime</h2>', unsafe_allow_html=True)
+        st.markdown('<h2 class="section-header" style="text-align:center; color: #FFD700;">Edit Anime</h2>', unsafe_allow_html=True)
         anime_data = st.session_state.anime_collection[st.session_state.edit_index]
     else:
-        st.markdown('<h2 class="section-header" style="text-align:center;">Add New Anime</h2>', unsafe_allow_html=True)
-        anime_data = {'anime_name': '', 'seasons': 1, 'total_episodes': 1, 'finished_episodes': 0, 'image': ""}
+        st.markdown('<h2 class="section-header" style="text-align:center; color: #FFD700;">Add New Anime</h2>', unsafe_allow_html=True)
+        anime_data = {'anime_name': '', 'seasons': 1, 'total_episodes': 1, 'finished_episodes': 0, 'image': None}
     with st.form("anime_form"):
         cols = st.columns([1, 2])
         with cols[0]:
             image_file = st.file_uploader("Upload Anime Image", type=["png", "jpg", "jpeg"])
             if image_file is not None:
-                anime_image = encode_image(image_file)
-                st.image(image_file, use_container_width=True)
+                anime_image = image_file.read()
+                st.image(anime_image, use_container_width=True)
             else:
-                anime_image = anime_data.get('image', "")
+                anime_image = anime_data.get('image')
                 if anime_image:
-                    st.image(decode_image(anime_image), use_container_width=True)
+                    st.image(anime_image, use_container_width=True)
                 else:
                     st.write("")
         with cols[1]:
@@ -305,7 +294,7 @@ def display_add_view():
             total_episodes = st.number_input("Total Episodes", min_value=1, value=anime_data.get('total_episodes', 1))
             finished_episodes = st.number_input("Finished Episodes", min_value=0, value=anime_data.get('finished_episodes', 0))
         progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
-        st.markdown(f"<p style='text-align:center;'>Progress: {progress:.1f}%</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align:center; color: #FFD700;'>Progress: {progress:.1f}%</p>", unsafe_allow_html=True)
         st.markdown(f"""
         <div class='progress-container'>
             <div class='progress-bar {"progress-low" if progress < 33 else "progress-medium" if progress < 66 else "progress-high"}' style='width: {progress}%;'></div>
@@ -334,7 +323,7 @@ def display_add_view():
 
 def display_edit_watched(index):
     anime = st.session_state.anime_collection[index]
-    st.markdown(f"<div style='text-align:center;'><h2 class='section-header'>Edit Watched Episodes for {anime['anime_name']}</h2></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center;'><h2 class='section-header' style='color: #FFD700;'>Edit Watched Episodes for {anime['anime_name']}</h2></div>", unsafe_allow_html=True)
     new_watched = st.number_input("Finished Episodes", min_value=0, value=anime['finished_episodes'], key="edit_watched_input")
     col1, col2 = st.columns(2)
     if col1.button("Save"):
@@ -347,7 +336,7 @@ def display_edit_watched(index):
     if col2.button("Cancel"):
         st.session_state.view = 'home'
     st.markdown("---")
-    if st.button("🗑️ Delete Anime"):
+    if st.button("🗑️ Delete Anime", key=f"edit_delete_{index}"):
         delete_anime(index)
 
 def main_page():
@@ -361,12 +350,16 @@ def main_page():
         if st.button("👤", key="user_logo"):
             st.session_state.user_menu_visible = not st.session_state.user_menu_visible
     if st.session_state.user_menu_visible:
-        st.markdown(f"<div class='user-info'><p style='margin:0;'>Logged in as: {st.session_state.username}</p>", unsafe_allow_html=True)
-        if st.button("Logout", key="logout_btn"):
-            logout()
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container():
+            cols = st.columns([2,1])
+            with cols[0]:
+                st.markdown(f"<p style='margin:0; color: #FFD700;'>Logged in as: {st.session_state.username}</p>", unsafe_allow_html=True)
+            with cols[1]:
+                if st.button("Logout", key="logout_btn"):
+                    logout()
+        st.markdown("")
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("<h1 style='text-align:center;'>Anime Tracker</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='tracker-title'>Anime Tracker</h1>", unsafe_allow_html=True)
     if st.session_state.view == 'home':
         display_home_view()
     elif st.session_state.view == 'add':

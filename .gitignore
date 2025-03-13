@@ -1,2 +1,11 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+
+# Secret keys and configuration files
 serviceAccountKey.json
 secrets.toml
+.streamlit/secrets.toml
