@@ -365,21 +365,6 @@ def auth_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Add this at the beginning of the function
-image_url = "/api/placeholder/400/180"
-if anime.get('image'):
-    # If there's an image in the anime data, create a data URL
-    try:
-        image_bytes = anime['image']
-        # If image is already in bytes format
-        if isinstance(image_bytes, bytes):
-            import base64
-            image_b64 = base64.b64encode(image_bytes).decode()
-            image_url = f"data:image/jpeg;base64,{image_b64}"
-    except:
-        # If any issue, fall back to placeholder
-        pass
-
 def render_anime_card(index, anime):
     progress = calculate_progress(anime)
     progress_class = "progress-low" if progress < 33 else "progress-medium" if progress < 66 else "progress-high"
@@ -389,6 +374,17 @@ def render_anime_card(index, anime):
     
     # Create placeholder image if none exists
     image_url = "/api/placeholder/400/180"
+    if anime.get('image'):
+        try:
+            image_bytes = anime['image']
+            # If image is already in bytes format
+            if isinstance(image_bytes, bytes):
+                import base64
+                image_b64 = base64.b64encode(image_bytes).decode()
+                image_url = f"data:image/jpeg;base64,{image_b64}"
+        except:
+            # If any issue, fall back to placeholder
+            pass
     
     # Format the card HTML with proper string substitution
     card_html = f"""
