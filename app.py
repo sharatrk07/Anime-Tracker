@@ -365,6 +365,21 @@ def auth_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
 
+# Add this at the beginning of the function
+image_url = "/api/placeholder/400/180"
+if anime.get('image'):
+    # If there's an image in the anime data, create a data URL
+    try:
+        image_bytes = anime['image']
+        # If image is already in bytes format
+        if isinstance(image_bytes, bytes):
+            import base64
+            image_b64 = base64.b64encode(image_bytes).decode()
+            image_url = f"data:image/jpeg;base64,{image_b64}"
+    except:
+        # If any issue, fall back to placeholder
+        pass
+
 def render_anime_card(index, anime):
     progress = calculate_progress(anime)
     progress_class = "progress-low" if progress < 33 else "progress-medium" if progress < 66 else "progress-high"
@@ -375,7 +390,8 @@ def render_anime_card(index, anime):
     # Create placeholder image if none exists
     image_url = "/api/placeholder/400/180"
     
-    st.markdown(f"""
+    # Format the card HTML with proper string substitution
+    card_html = f"""
     <div class="anime-card">
         <div class="anime-image" style="background-image: url('{image_url}');">
             <div class="status-overlay">
@@ -392,26 +408,18 @@ def render_anime_card(index, anime):
                 <div class="progress-bar {progress_class}" style="width: {progress}%;"></div>
             </div>
             <div style="text-align:center; font-size:0.8rem; margin:4px 0 12px;">{progress}% complete</div>
-            
-            <div style="margin-top:auto; display:flex; gap:8px;">
-    <button 
-        onclick="document.getElementById('edit_{index}_btn').click()" 
-        style="flex:1; background-color:var(--primary); color:white; border:none; border-radius:var(--radius-md); padding:6px 0; cursor:pointer;">
-        ✏️ Edit
-    </button>
-    <button 
-        onclick="document.getElementById('delete_{index}_btn').click()" 
-        style="flex:1; background-color:var(--secondary-dark); color:white; border:none; border-radius:var(--radius-md); padding:6px 0; cursor:pointer;">
-        🗑️ Delete
-    </button>
-</div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
     
-    # Hidden buttons to handle the JavaScript click events
-    st.button("Edit", key=f"edit_{index}_btn", on_click=lambda: handle_action(f"edit_{index}", set_view, 'add', edit_index=index), help="Edit anime details")
-    st.button("Delete", key=f"delete_{index}_btn", on_click=lambda: handle_action(f"delete_{index}", delete_anime, index), help="Delete anime")
+    st.markdown(card_html, unsafe_allow_html=True)
+    
+    # Create separate buttons directly with Streamlit instead of HTML
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("✏️ Edit", key=f"edit_visible_{index}", on_click=lambda: handle_action(f"edit_{index}", set_view, 'add', edit_index=index), use_container_width=True)
+    with col2:
+        st.button("🗑️ Delete", key=f"delete_visible_{index}", on_click=lambda: handle_action(f"delete_{index}", delete_anime, index), use_container_width=True)
 
 def display_section(title, anime_list):
     if not anime_list:
