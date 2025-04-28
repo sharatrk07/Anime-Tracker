@@ -22,8 +22,10 @@ if 'anime_collection' not in st.session_state:
     st.session_state.anime_collection = []
 if 'user_menu_visible' not in st.session_state:
     st.session_state.user_menu_visible = False
-if 'search_active' not in st.session_state:
-    st.session_state.search_active = False
+if 'last_action_time' not in st.session_state:
+    st.session_state.last_action_time = 0
+if 'pending_action' not in st.session_state:
+    st.session_state.pending_action = None
 
 # Configure page settings
 st.set_page_config(
@@ -126,7 +128,7 @@ st.markdown("""
 }
 
 .page-title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 700;
     text-align: center;
     background: linear-gradient(90deg, var(--primary-light), var(--secondary-light));
@@ -136,14 +138,13 @@ st.markdown("""
 }
 
 .section-header {
-    font-size: 1.8rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 600;
     padding: var(--spacing-sm) var(--spacing-md);
-    border-left: 6px solid var(--primary);
-    margin: var(--spacing-lg) 0 var(--spacing-md);
+    border-left: 4px solid var(--primary);
+    margin: var(--spacing-md) 0;
     background-color: rgba(138, 79, 255, 0.1);
     border-radius: var(--radius-sm);
-    color: var(--primary-light);
 }
 
 .auth-container {
@@ -183,7 +184,6 @@ st.markdown("""
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 1px solid var(--surface-variant);
     height: 100%;
-    margin-bottom: var(--spacing-md);
 }
 
 .anime-card:hover {
@@ -196,7 +196,7 @@ st.markdown("""
 }
 
 .anime-title {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: var(--spacing-xs);
     color: var(--primary-light);
@@ -316,31 +316,6 @@ st.markdown("""
     min-width: 36px !important;
 }
 
-.search-container {
-    display: flex;
-    align-items: center;
-    position: relative;
-}
-
-.search-cancel {
-    position: absolute;
-    right: 10px;
-    cursor: pointer;
-    color: var(--on-surface-medium);
-    font-weight: bold;
-}
-
-.anime-image-container {
-    height: 180px;
-    background-color: var(--surface-variant);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 8px 0;
-    overflow: hidden;
-    border-radius: var(--radius-sm);
-}
-
 /* Responsive design */
 @media (max-width: 768px) {
     .anime-grid {
@@ -352,10 +327,14 @@ st.markdown("""
 
 # Helper Functions
 def handle_action(action_name, callback_func, *args, **kwargs):
-    """Handle button actions without requiring double presses"""
-    callback_func(*args, **kwargs)
-    # Force a rerun after state change
-    st.rerun()
+    """Handle button actions with debounce to prevent double presses"""
+    current_time = time.time()
+    # Prevent double presses by requiring a minimum time between actions
+    if current_time - st.session_state.last_action_time > 0.5:
+        st.session_state.last_action_time = current_time
+        callback_func(*args, **kwargs)
+        # Force a rerun after state change
+        st.rerun()
 
 def filter_anime_collection():
     """Filter anime collection based on search query"""
@@ -428,7 +407,6 @@ def logout():
     st.session_state.edit_watched_index = None
     st.session_state.anime_collection = []
     st.session_state.user_menu_visible = False
-    st.session_state.search_active = False
     st.set_query_params({})
 
 def set_view(view_name, **kwargs):
@@ -437,11 +415,6 @@ def set_view(view_name, **kwargs):
     for key, value in kwargs.items():
         if key in st.session_state:
             st.session_state[key] = value
-
-def clear_search():
-    """Clear the search query"""
-    st.session_state.search_query = ""
-    st.session_state.search_active = False
 
 # UI Components
 def auth_page():
@@ -488,69 +461,50 @@ def auth_page():
     st.markdown('</div>', unsafe_allow_html=True)
 
 def render_anime_card(index, anime):
-    """Render a single anime card with image"""
+    """Render a single anime card"""
     progress = calculate_progress(anime)
     progress_class = "progress-low" if progress < 33 else "progress-medium" if progress < 66 else "progress-high"
     status = get_status(anime)
     status_text = {"watching": "Watching", "finished": "Completed", "upcoming": "Plan to Watch"}[status]
     status_class = {"watching": "status-watching", "finished": "status-finished", "upcoming": "status-upcoming"}[status]
     
-    # Container for the entire card
-    card_container = st.container()
-    
-    with card_container:
-        st.markdown(f"""
-        <div class="anime-card">
-            <div class="anime-card-content">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <h3 class="anime-title">{anime['anime_name']}</h3>
-                    <span class="status-badge {status_class}">{status_text}</span>
-                </div>
-        """, unsafe_allow_html=True)
-        
-        # Display image if available
-        if anime.get('image'):
-            try:
-                st.image(anime['image'], use_container_width=True, clamp=True)
-            except:
-                st.markdown('<div class="anime-image-container"><span style="font-size:3rem;">📺</span></div>', unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="anime-image-container"><span style="font-size:3rem;">📺</span></div>', unsafe_allow_html=True)
-        
-        st.markdown(f"""
-                <div class="anime-stats">
-                    <span>Seasons: {anime['seasons']}</span>
-                    <span>Episodes: {anime['finished_episodes']}/{anime['total_episodes']}</span>
-                </div>
-                <div class="progress-container">
-                    <div class="progress-bar {progress_class}" style="width: {progress}%;"></div>
-                </div>
-                <div style="text-align:center; font-size:0.8rem; margin:4px 0 12px;">{progress}% complete</div>
+    st.markdown(f"""
+    <div class="anime-card">
+        <div class="anime-card-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h3 class="anime-title">{anime['anime_name']}</h3>
+                <span class="status-badge {status_class}">{status_text}</span>
             </div>
+            <div class="anime-stats">
+                <span>Seasons: {anime['seasons']}</span>
+                <span>Episodes: {anime['finished_episodes']}/{anime['total_episodes']}</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar {progress_class}" style="width: {progress}%;"></div>
+            </div>
+            <div style="text-align:center; font-size:0.8rem; margin:4px 0 12px;">{progress}% complete</div>
         </div>
-        """, unsafe_allow_html=True)
-        
-        col1, col2 = st.columns(2)
-        if col1.button("✏️ Edit", key=f"edit_{index}", use_container_width=True):
-            set_view('add', edit_index=index)
-        if col2.button("🗑️ Delete", key=f"delete_{index}", use_container_width=True):
-            delete_anime(index)
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    if col1.button("✏️ Edit", key=f"edit_{index}", use_container_width=True):
+        handle_action(f"edit_{index}", set_view, 'add', edit_index=index)
+    if col2.button("🗑️ Delete", key=f"delete_{index}", use_container_width=True):
+        handle_action(f"delete_{index}", delete_anime, index)
 
 def display_section(title, anime_list):
-    """Display a section of anime cards with 2 cards per row"""
+    """Display a section of anime cards"""
     if not anime_list:
         return
     
-    st.markdown(f'<h1 class="section-header">{title}</h1>', unsafe_allow_html=True)
+    st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
     
-    # Create a grid of anime cards with 2 per row
-    for i in range(0, len(anime_list), 2):
-        cols = st.columns(2)
-        for j in range(2):
-            if i + j < len(anime_list):
-                with cols[j]:
-                    idx, anime = anime_list[i + j]
-                    render_anime_card(idx, anime)
+    # Create a grid of anime cards
+    cols = st.columns(3)
+    for i, (idx, anime) in enumerate(anime_list):
+        with cols[i % 3]:
+            render_anime_card(idx, anime)
 
 def display_home_view():
     """Display home view with categorized anime lists"""
@@ -580,10 +534,10 @@ def display_add_view():
     is_edit = st.session_state.edit_index is not None
     
     if is_edit:
-        st.markdown('<h1 class="section-header">Edit Anime</h1>', unsafe_allow_html=True)
+        st.markdown('<h2 class="section-header">Edit Anime</h2>', unsafe_allow_html=True)
         anime_data = st.session_state.anime_collection[st.session_state.edit_index]
     else:
-        st.markdown('<h1 class="section-header">Add New Anime</h1>', unsafe_allow_html=True)
+        st.markdown('<h2 class="section-header">Add New Anime</h2>', unsafe_allow_html=True)
         anime_data = {'anime_name': '', 'seasons': 1, 'total_episodes': 12, 'finished_episodes': 0, 'image': None}
     
     with st.form("anime_form", clear_on_submit=False):
@@ -637,6 +591,7 @@ def display_add_view():
                 'image': anime_image
             }
             save_anime_data(new_anime, st.session_state.edit_index if is_edit else None)
+            st.rerun()
     
     if cancel:
         st.session_state.view = 'home'
@@ -644,31 +599,20 @@ def display_add_view():
         st.rerun()
 
 def display_header():
-    """Display application header with improved search and user menu"""
+    """Display application header with search and user menu"""
     col1, col2, col3 = st.columns([4, 1, 1])
     
     with col1:
-        # Improved search with auto-update and cancel button
-        search_col1, search_col2 = st.columns([6, 1])
-        with search_col1:
-            search = st.text_input("", value=st.session_state.search_query, 
-                                placeholder="Search anime titles...", 
-                                key="search_input", 
-                                on_change=lambda: setattr(st.session_state, 'search_active', bool(st.session_state.search_query)))
-            
-            if search != st.session_state.search_query:
-                st.session_state.search_query = search
-                st.rerun()
-        
-        with search_col2:
-            # Only show cancel button when search is active
-            if st.session_state.search_active:
-                if st.button("❌", key="clear_search", use_container_width=True):
-                    clear_search()
+        search = st.text_input("", value=st.session_state.search_query, 
+                              placeholder="Search anime...", 
+                              key="search_input")
+        if search != st.session_state.search_query:
+            st.session_state.search_query = search
+            st.rerun()
     
     with col2:
         if st.button("➕ Add New", key="add_button", use_container_width=True):
-            set_view('add', edit_index=None)
+            handle_action("add_new", set_view, 'add', edit_index=None)
     
     with col3:
         if st.button(f"👤 {st.session_state.username}", key="user_button", use_container_width=True):
@@ -682,7 +626,7 @@ def display_header():
         </div>
         """, unsafe_allow_html=True)
         if st.button("Logout", key="logout_button", use_container_width=True):
-            logout()
+            handle_action("logout", logout)
 
 def main_page():
     """Main application page"""
