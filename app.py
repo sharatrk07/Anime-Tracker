@@ -394,17 +394,17 @@ def render_anime_card(index, anime):
             <div style="text-align:center; font-size:0.8rem; margin:4px 0 12px;">{progress}% complete</div>
             
             <div style="margin-top:auto; display:flex; gap:8px;">
-                <button 
-                    onclick="document.getElementById('edit_{index}_btn').click()" 
-                    style="flex:1; background-color:var(--primary); color:white; border:none; border-radius:var(--radius-md); padding:6px 0; cursor:pointer;">
-                    ✏️ Edit
-                </button>
-                <button 
-                    onclick="document.getElementById('delete_{index}_btn').click()" 
-                    style="flex:1; background-color:var(--secondary-dark); color:white; border:none; border-radius:var(--radius-md); padding:6px 0; cursor:pointer;">
-                    🗑️ Delete
-                </button>
-            </div>
+    <button 
+        onclick="document.getElementById('edit_{index}_btn').click()" 
+        style="flex:1; background-color:var(--primary); color:white; border:none; border-radius:var(--radius-md); padding:6px 0; cursor:pointer;">
+        ✏️ Edit
+    </button>
+    <button 
+        onclick="document.getElementById('delete_{index}_btn').click()" 
+        style="flex:1; background-color:var(--secondary-dark); color:white; border:none; border-radius:var(--radius-md); padding:6px 0; cursor:pointer;">
+        🗑️ Delete
+    </button>
+</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
