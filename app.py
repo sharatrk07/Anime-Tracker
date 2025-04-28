@@ -35,7 +35,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Enhanced CSS with better visual hierarchy and modern design
 st.markdown("""
 <style>
 :root {
@@ -75,14 +74,12 @@ st.markdown("""
     --spacing-xl: 32px;
 }
 
-/* Base styles */
 .stApp {
     background-color: var(--background);
     color: var(--on-surface);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Fix Streamlit elements */
 .stButton>button, .stFormSubmit>button {
     background-color: var(--primary);
     color: white;
@@ -99,80 +96,35 @@ st.markdown("""
     box-shadow: var(--elevation-2);
 }
 
-.stButton>button:active, .stFormSubmit>button:active {
-    transform: translateY(0);
-}
-
-.stTextInput>div>div>input, .stNumberInput>div>div>input {
-    background-color: var(--surface);
-    border: 1px solid var(--surface-variant);
-    border-radius: var(--radius-md);
-    color: var(--on-surface);
-    padding: 0.5rem;
-}
-
-.stTextInput>div>div>input:focus, .stNumberInput>div>div>input:focus {
-    border: 1px solid var(--primary);
-}
-
-/* App components */
-.app-header {
-    background-color: var(--surface);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--spacing-lg);
-    box-shadow: var(--elevation-1);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
 .page-title {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     font-weight: 700;
     text-align: center;
     background: linear-gradient(90deg, var(--primary-light), var(--secondary-light));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: var(--spacing-md) 0;
+    padding: var(--spacing-md);
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .section-header {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.8rem;
+    font-weight: 700;
     padding: var(--spacing-sm) var(--spacing-md);
-    border-left: 4px solid var(--primary);
-    margin: var(--spacing-md) 0;
-    background-color: rgba(138, 79, 255, 0.1);
+    border-left: 6px solid var(--primary);
+    margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+    background-color: rgba(138, 79, 255, 0.15);
     border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary-light);
 }
 
-.auth-container {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: var(--spacing-lg);
-    background-color: var(--surface);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--elevation-2);
-}
-
-.auth-title {
-    color: var(--primary);
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: var(--spacing-lg);
-}
-
-.auth-subtitle {
-    color: var(--secondary);
-    font-size: 1.5rem;
-    margin: var(--spacing-lg) 0 var(--spacing-md);
-}
-
-/* Anime cards */
 .anime-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
 }
@@ -184,22 +136,46 @@ st.markdown("""
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 1px solid var(--surface-variant);
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .anime-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--elevation-3);
+    border-color: var(--primary-light);
+}
+
+.anime-image {
+    height: 180px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: var(--surface-variant);
+    position: relative;
+}
+
+.status-overlay {
+    position: absolute;
+    top: 8px;
+    right: 8px;
 }
 
 .anime-card-content {
     padding: var(--spacing-md);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .anime-title {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 600;
     margin-bottom: var(--spacing-xs);
     color: var(--primary-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .anime-stats {
@@ -212,111 +188,40 @@ st.markdown("""
 
 .status-badge {
     display: inline-block;
-    padding: 2px 8px;
+    padding: 4px 10px;
     border-radius: var(--radius-lg);
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
+    box-shadow: var(--elevation-1);
 }
 
-.status-watching {
-    background-color: var(--status-watching);
-    color: #000000;
-}
-
-.status-finished {
-    background-color: var(--status-finished);
-    color: #FFFFFF;
-}
-
-.status-upcoming {
-    background-color: var(--status-upcoming);
-    color: #000000;
-}
-
-.progress-container {
-    width: 100%;
-    background-color: var(--surface-variant);
-    border-radius: var(--radius-sm);
-    height: 6px;
-    margin: var(--spacing-sm) 0;
-    overflow: hidden;
-}
-
-.progress-bar {
-    height: 100%;
-    border-radius: var(--radius-sm);
-    transition: width 0.3s ease;
-}
-
-.progress-low {
-    background-color: var(--status-upcoming);
-}
-
-.progress-medium {
-    background-color: var(--primary);
-}
-
-.progress-high {
-    background-color: var(--status-watching);
-}
-
-.anime-card-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: var(--spacing-md);
-}
-
-.user-menu {
-    position: absolute;
-    top: 60px;
-    right: 10px;
-    background-color: var(--surface);
-    border-radius: var(--radius-md);
-    box-shadow: var(--elevation-3);
-    padding: var(--spacing-md);
-    z-index: 1000;
-    border: 1px solid var(--surface-variant);
-    min-width: 200px;
-}
-
-.empty-state {
-    text-align: center;
-    padding: var(--spacing-xl);
-    background-color: var(--surface);
-    border-radius: var(--radius-md);
-    margin: var(--spacing-lg) 0;
-}
-
-.empty-state-icon {
-    font-size: 3rem;
+.search-container {
+    position: relative;
     margin-bottom: var(--spacing-md);
-    color: var(--on-surface-disabled);
 }
 
-.empty-state-text {
+.search-clear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
     color: var(--on-surface-medium);
-    font-size: 1.1rem;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
 }
 
-.button-primary {
-    background-color: var(--primary) !important;
+.search-clear:hover {
+    color: var(--secondary);
 }
 
-.button-secondary {
-    background-color: var(--secondary) !important;
-}
-
-.button-danger {
-    background-color: var(--secondary-dark) !important;
-}
-
-.button-icon {
-    padding: 6px !important;
-    min-width: 36px !important;
-}
-
-/* Responsive design */
+/* Responsive adjustments */
 @media (max-width: 768px) {
     .anime-grid {
         grid-template-columns: 1fr;
@@ -461,20 +366,24 @@ def auth_page():
     st.markdown('</div>', unsafe_allow_html=True)
 
 def render_anime_card(index, anime):
-    """Render a single anime card"""
     progress = calculate_progress(anime)
     progress_class = "progress-low" if progress < 33 else "progress-medium" if progress < 66 else "progress-high"
     status = get_status(anime)
     status_text = {"watching": "Watching", "finished": "Completed", "upcoming": "Plan to Watch"}[status]
     status_class = {"watching": "status-watching", "finished": "status-finished", "upcoming": "status-upcoming"}[status]
     
+    # Create placeholder image if none exists
+    image_url = "/api/placeholder/400/180"
+    
     st.markdown(f"""
     <div class="anime-card">
-        <div class="anime-card-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 class="anime-title">{anime['anime_name']}</h3>
+        <div class="anime-image" style="background-image: url('{image_url}');">
+            <div class="status-overlay">
                 <span class="status-badge {status_class}">{status_text}</span>
             </div>
+        </div>
+        <div class="anime-card-content">
+            <h3 class="anime-title">{anime['anime_name']}</h3>
             <div class="anime-stats">
                 <span>Seasons: {anime['seasons']}</span>
                 <span>Episodes: {anime['finished_episodes']}/{anime['total_episodes']}</span>
@@ -483,28 +392,41 @@ def render_anime_card(index, anime):
                 <div class="progress-bar {progress_class}" style="width: {progress}%;"></div>
             </div>
             <div style="text-align:center; font-size:0.8rem; margin:4px 0 12px;">{progress}% complete</div>
+            
+            <div style="margin-top:auto; display:flex; gap:8px;">
+                <button 
+                    onclick="document.getElementById('edit_{index}_btn').click()" 
+                    style="flex:1; background-color:var(--primary); color:white; border:none; border-radius:var(--radius-md); padding:6px 0; cursor:pointer;">
+                    ✏️ Edit
+                </button>
+                <button 
+                    onclick="document.getElementById('delete_{index}_btn').click()" 
+                    style="flex:1; background-color:var(--secondary-dark); color:white; border:none; border-radius:var(--radius-md); padding:6px 0; cursor:pointer;">
+                    🗑️ Delete
+                </button>
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    col1, col2 = st.columns(2)
-    if col1.button("✏️ Edit", key=f"edit_{index}", use_container_width=True):
-        handle_action(f"edit_{index}", set_view, 'add', edit_index=index)
-    if col2.button("🗑️ Delete", key=f"delete_{index}", use_container_width=True):
-        handle_action(f"delete_{index}", delete_anime, index)
+    # Hidden buttons to handle the JavaScript click events
+    st.button("Edit", key=f"edit_{index}_btn", on_click=lambda: handle_action(f"edit_{index}", set_view, 'add', edit_index=index), help="Edit anime details")
+    st.button("Delete", key=f"delete_{index}_btn", on_click=lambda: handle_action(f"delete_{index}", delete_anime, index), help="Delete anime")
 
 def display_section(title, anime_list):
-    """Display a section of anime cards"""
     if not anime_list:
         return
     
     st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
     
-    # Create a grid of anime cards
-    cols = st.columns(3)
-    for i, (idx, anime) in enumerate(anime_list):
-        with cols[i % 3]:
-            render_anime_card(idx, anime)
+    # Create a grid for anime cards (2 columns)
+    for i in range(0, len(anime_list), 2):
+        cols = st.columns(2)
+        for j in range(2):
+            idx = i + j
+            if idx < len(anime_list):
+                with cols[j]:
+                    render_anime_card(anime_list[idx][0], anime_list[idx][1])
 
 def display_home_view():
     """Display home view with categorized anime lists"""
@@ -529,8 +451,8 @@ def display_home_view():
         display_section("Upcoming Watchables", upcoming)
         display_section("Completed", finished)
 
+# Enhanced add view with image preview
 def display_add_view():
-    """Display add/edit anime form"""
     is_edit = st.session_state.edit_index is not None
     
     if is_edit:
@@ -541,39 +463,49 @@ def display_add_view():
         anime_data = {'anime_name': '', 'seasons': 1, 'total_episodes': 12, 'finished_episodes': 0, 'image': None}
     
     with st.form("anime_form", clear_on_submit=False):
-        anime_name = st.text_input("Anime Name", value=anime_data.get('anime_name', ''))
+        col_img, col_form = st.columns([1, 2])
         
-        col1, col2 = st.columns(2)
-        with col1:
-            seasons = st.number_input("Seasons", min_value=1, value=anime_data.get('seasons', 1))
-        with col2:
-            total_episodes = st.number_input("Total Episodes", min_value=1, value=anime_data.get('total_episodes', 12))
-        
-        finished_episodes = st.slider("Episodes Watched", 0, max(total_episodes, 1), anime_data.get('finished_episodes', 0))
-        
-        image_file = st.file_uploader("Cover Image (optional)", type=["png", "jpg", "jpeg"])
-        
-        if image_file is not None:
-            anime_image = image_file.read()
-            st.image(anime_image, use_container_width=True)
-        else:
-            anime_image = anime_data.get('image')
-            if anime_image:
+        with col_img:
+            image_file = st.file_uploader("Cover Image", type=["png", "jpg", "jpeg"])
+            if image_file is not None:
+                anime_image = image_file.read()
                 st.image(anime_image, use_container_width=True)
+            else:
+                anime_image = anime_data.get('image')
+                if anime_image:
+                    st.image(anime_image, use_container_width=True)
+                else:
+                    st.markdown("""
+                    <div style="height:200px; display:flex; align-items:center; justify-content:center; 
+                                background-color:var(--surface-variant); border-radius:var(--radius-md);">
+                        <span style="color:var(--on-surface-disabled);">No Image</span>
+                    </div>
+                    """, unsafe_allow_html=True)
         
-        progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
-        st.markdown(f"""
-        <div style="margin-top:16px;">
-            <p style="text-align:center; margin-bottom:4px;">Progress: {progress:.1f}%</p>
-            <div class="progress-container">
-                <div class="progress-bar {"progress-low" if progress < 33 else "progress-medium" if progress < 66 else "progress-high"}" style="width: {progress}%;"></div>
+        with col_form:
+            anime_name = st.text_input("Anime Name", value=anime_data.get('anime_name', ''))
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                seasons = st.number_input("Seasons", min_value=1, value=anime_data.get('seasons', 1))
+            with col2:
+                total_episodes = st.number_input("Total Episodes", min_value=1, value=anime_data.get('total_episodes', 12))
+            
+            finished_episodes = st.slider("Episodes Watched", 0, max(total_episodes, 1), anime_data.get('finished_episodes', 0))
+            
+            progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
+            st.markdown(f"""
+            <div style="margin-top:16px;">
+                <p style="text-align:center; margin-bottom:4px;">Progress: {progress:.1f}%</p>
+                <div class="progress-container">
+                    <div class="progress-bar {"progress-low" if progress < 33 else "progress-medium" if progress < 66 else "progress-high"}" style="width: {progress}%;"></div>
+                </div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
         
         col1, col2 = st.columns(2)
         with col1:
-            submit = st.form_submit_button("Save", use_container_width=True)
+            submit = st.form_submit_button("Save Anime", use_container_width=True)
         with col2:
             cancel = st.form_submit_button("Cancel", use_container_width=True)
     
@@ -599,16 +531,23 @@ def display_add_view():
         st.rerun()
 
 def display_header():
-    """Display application header with search and user menu"""
     col1, col2, col3 = st.columns([4, 1, 1])
     
     with col1:
-        search = st.text_input("", value=st.session_state.search_query, 
-                              placeholder="Search anime...", 
-                              key="search_input")
-        if search != st.session_state.search_query:
-            st.session_state.search_query = search
-            st.rerun()
+        search_container = st.container()
+        with search_container:
+            search_col1, search_col2 = st.columns([6, 1])
+            with search_col1:
+                search = st.text_input("", value=st.session_state.search_query, 
+                                    placeholder="Search your anime collection...", 
+                                    key="search_input", 
+                                    on_change=lambda: handle_action("search", lambda: None))
+            
+            if st.session_state.search_query:
+                with search_col2:
+                    if st.button("✕", key="clear_search"):
+                        st.session_state.search_query = ""
+                        st.rerun()
     
     with col2:
         if st.button("➕ Add New", key="add_button", use_container_width=True):
@@ -628,8 +567,8 @@ def display_header():
         if st.button("Logout", key="logout_button", use_container_width=True):
             handle_action("logout", logout)
 
+# Updated main_page function
 def main_page():
-    """Main application page"""
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
     
     display_header()
