@@ -82,20 +82,101 @@ st.markdown("""
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Section headers - made more prominent */
-.section-header {
-    font-size: 1.8rem;
-    font-weight: 700;
-    padding: var(--spacing-md) var(--spacing-lg);
-    margin: var(--spacing-lg) 0 var(--spacing-md);
-    background: linear-gradient(90deg, var(--primary-dark), transparent);
-    border-radius: var(--radius-md);
-    letter-spacing: 0.5px;
+/* Fix Streamlit elements */
+.stButton>button, .stFormSubmit>button {
+    background-color: var(--primary);
     color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
-/* Anime card with image display */
+.stButton>button:hover, .stFormSubmit>button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--elevation-2);
+}
+
+.stButton>button:active, .stFormSubmit>button:active {
+    transform: translateY(0);
+}
+
+.stTextInput>div>div>input, .stNumberInput>div>div>input {
+    background-color: var(--surface);
+    border: 1px solid var(--surface-variant);
+    border-radius: var(--radius-md);
+    color: var(--on-surface);
+    padding: 0.5rem;
+}
+
+.stTextInput>div>div>input:focus, .stNumberInput>div>div>input:focus {
+    border: 1px solid var(--primary);
+}
+
+/* App components */
+.app-header {
+    background-color: var(--surface);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--elevation-1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.page-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(90deg, var(--primary-light), var(--secondary-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: var(--spacing-md) 0;
+}
+
+.section-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-left: 4px solid var(--primary);
+    margin: var(--spacing-md) 0;
+    background-color: rgba(138, 79, 255, 0.1);
+    border-radius: var(--radius-sm);
+}
+
+.auth-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+    background-color: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--elevation-2);
+}
+
+.auth-title {
+    color: var(--primary);
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.auth-subtitle {
+    color: var(--secondary);
+    font-size: 1.5rem;
+    margin: var(--spacing-lg) 0 var(--spacing-md);
+}
+
+/* Anime cards */
+.anime-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
 .anime-card {
     background-color: var(--surface);
     border-radius: var(--radius-md);
@@ -103,108 +184,142 @@ st.markdown("""
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 1px solid var(--surface-variant);
     height: 100%;
-    display: flex;
-    flex-direction: column;
 }
 
 .anime-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--elevation-3);
-    border-color: var(--primary-light);
-}
-
-.anime-image {
-    width: 100%;
-    height: 180px;
-    background-size: cover;
-    background-position: center;
-    background-color: var(--surface-variant);
-    position: relative;
-}
-
-.anime-image-placeholder {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    font-size: 3rem;
-    color: var(--on-surface-disabled);
-    background: linear-gradient(135deg, var(--surface), var(--surface-variant));
 }
 
 .anime-card-content {
     padding: var(--spacing-md);
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
 }
 
 .anime-title {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: var(--spacing-xs);
     color: var(--primary-light);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    height: 2.8rem;
 }
 
-/* Search bar styling */
-.search-container {
-    position: relative;
-    margin-bottom: var(--spacing-md);
-}
-
-.search-input {
-    width: 100%;
-    padding: var(--spacing-md);
-    padding-right: 40px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--surface-variant);
-    background-color: var(--surface);
-    color: var(--on-surface);
-    font-size: 1rem;
-}
-
-.search-clear-button {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: var(--on-surface-medium);
-    cursor: pointer;
-    font-size: 1.2rem;
+.anime-stats {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    transition: background-color 0.2s ease;
+    justify-content: space-between;
+    margin: var(--spacing-xs) 0;
+    font-size: 0.9rem;
+    color: var(--on-surface-medium);
 }
 
-.search-clear-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--radius-lg);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
-/* Responsive two-column layout */
-@media (min-width: 768px) {
+.status-watching {
+    background-color: var(--status-watching);
+    color: #000000;
+}
+
+.status-finished {
+    background-color: var(--status-finished);
+    color: #FFFFFF;
+}
+
+.status-upcoming {
+    background-color: var(--status-upcoming);
+    color: #000000;
+}
+
+.progress-container {
+    width: 100%;
+    background-color: var(--surface-variant);
+    border-radius: var(--radius-sm);
+    height: 6px;
+    margin: var(--spacing-sm) 0;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: var(--radius-sm);
+    transition: width 0.3s ease;
+}
+
+.progress-low {
+    background-color: var(--status-upcoming);
+}
+
+.progress-medium {
+    background-color: var(--primary);
+}
+
+.progress-high {
+    background-color: var(--status-watching);
+}
+
+.anime-card-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--spacing-md);
+}
+
+.user-menu {
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    background-color: var(--surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--elevation-3);
+    padding: var(--spacing-md);
+    z-index: 1000;
+    border: 1px solid var(--surface-variant);
+    min-width: 200px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    background-color: var(--surface);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-lg) 0;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--on-surface-disabled);
+}
+
+.empty-state-text {
+    color: var(--on-surface-medium);
+    font-size: 1.1rem;
+}
+
+.button-primary {
+    background-color: var(--primary) !important;
+}
+
+.button-secondary {
+    background-color: var(--secondary) !important;
+}
+
+.button-danger {
+    background-color: var(--secondary-dark) !important;
+}
+
+.button-icon {
+    padding: 6px !important;
+    min-width: 36px !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
     .anime-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--spacing-md);
-    }
-}
-
-@media (max-width: 767px) {
-    .anime-grid {
-        display: grid;
         grid-template-columns: 1fr;
-        gap: var(--spacing-md);
     }
 }
 </style>
@@ -212,24 +327,14 @@ st.markdown("""
 
 # Helper Functions
 def handle_action(action_name, callback_func, *args, **kwargs):
-    """Handle button actions with improved debounce to prevent double presses"""
+    """Handle button actions with debounce to prevent double presses"""
     current_time = time.time()
-    
-    # Check if we're trying to perform the same action too quickly
-    if (st.session_state.pending_action == action_name and 
-        current_time - st.session_state.last_action_time < 0.8):
-        # Ignore this action, it's too soon
-        return
-    
-    # Set current action as pending
-    st.session_state.pending_action = action_name
-    st.session_state.last_action_time = current_time
-    
-    # Execute the callback
-    callback_func(*args, **kwargs)
-    
-    # Force a rerun after state change
-    st.rerun()
+    # Prevent double presses by requiring a minimum time between actions
+    if current_time - st.session_state.last_action_time > 0.5:
+        st.session_state.last_action_time = current_time
+        callback_func(*args, **kwargs)
+        # Force a rerun after state change
+        st.rerun()
 
 def filter_anime_collection():
     """Filter anime collection based on search query"""
@@ -356,29 +461,17 @@ def auth_page():
     st.markdown('</div>', unsafe_allow_html=True)
 
 def render_anime_card(index, anime):
-    """Render a single anime card with image"""
+    """Render a single anime card"""
     progress = calculate_progress(anime)
     progress_class = "progress-low" if progress < 33 else "progress-medium" if progress < 66 else "progress-high"
     status = get_status(anime)
     status_text = {"watching": "Watching", "finished": "Completed", "upcoming": "Plan to Watch"}[status]
     status_class = {"watching": "status-watching", "finished": "status-finished", "upcoming": "status-upcoming"}[status]
     
-    # Display image if available, otherwise show placeholder
-    has_image = anime.get('image') is not None
-    
-    if has_image:
-        # Use a container to display the image
-        image_container = st.container()
-        with image_container:
-            st.image(anime['image'], width=300, use_column_width=True)
-    
     st.markdown(f"""
     <div class="anime-card">
-        <div class="anime-image">
-            {"" if has_image else f'<div class="anime-image-placeholder">🎬</div>'}
-        </div>
         <div class="anime-card-content">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                 <h3 class="anime-title">{anime['anime_name']}</h3>
                 <span class="status-badge {status_class}">{status_text}</span>
             </div>
@@ -401,22 +494,17 @@ def render_anime_card(index, anime):
         handle_action(f"delete_{index}", delete_anime, index)
 
 def display_section(title, anime_list):
-    """Display a section of anime cards in 2-column grid"""
+    """Display a section of anime cards"""
     if not anime_list:
         return
     
     st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
     
-    # Create a grid of anime cards - 2 per row
-    st.markdown('<div class="anime-grid">', unsafe_allow_html=True)
-    
-    # Use column layout for each anime
-    for idx, (anime_idx, anime) in enumerate(anime_list):
-        st.markdown(f'<div class="anime-grid-item">', unsafe_allow_html=True)
-        render_anime_card(anime_idx, anime)
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Create a grid of anime cards
+    cols = st.columns(3)
+    for i, (idx, anime) in enumerate(anime_list):
+        with cols[i % 3]:
+            render_anime_card(idx, anime)
 
 def display_home_view():
     """Display home view with categorized anime lists"""
@@ -511,79 +599,16 @@ def display_add_view():
         st.rerun()
 
 def display_header():
-    """Display application header with enhanced search and user menu"""
+    """Display application header with search and user menu"""
     col1, col2, col3 = st.columns([4, 1, 1])
     
     with col1:
-        search_container = st.container()
-        with search_container:
-            st.markdown("""
-            <div class="search-container">
-                <input type="text" id="search-input" class="search-input" 
-                       placeholder="Search anime by title..." 
-                       value="{search_query}">
-                <button class="search-clear-button" id="search-clear" 
-                        style="display: {clear_display};">✕</button>
-            </div>
-            """.format(
-                search_query=st.session_state.search_query,
-                clear_display="inline-flex" if st.session_state.search_query else "none"
-            ), unsafe_allow_html=True)
-            
-            # Add JavaScript for real-time search with debounce
-            st.markdown("""
-            <script>
-                const searchInput = document.getElementById('search-input');
-                const clearButton = document.getElementById('search-clear');
-                let debounceTimer;
-                
-                searchInput.addEventListener('input', function() {
-                    clearTimeout(debounceTimer);
-                    clearButton.style.display = this.value ? 'inline-flex' : 'none';
-                    
-                    debounceTimer = setTimeout(() => {
-                        const formData = new FormData();
-                        formData.append('search_query', this.value);
-                        formData.append('search_action', 'search');
-                        
-                        fetch(window.location.href, {
-                            method: 'POST',
-                            body: formData
-                        }).then(response => {
-                            if (response.ok) {
-                                window.location.reload();
-                            }
-                        });
-                    }, 500);
-                });
-                
-                clearButton.addEventListener('click', function() {
-                    searchInput.value = '';
-                    clearButton.style.display = 'none';
-                    
-                    const formData = new FormData();
-                    formData.append('search_query', '');
-                    formData.append('search_action', 'clear');
-                    
-                    fetch(window.location.href, {
-                        method: 'POST',
-                        body: formData
-                    }).then(response => {
-                        if (response.ok) {
-                            window.location.reload();
-                        }
-                    });
-                });
-            </script>
-            """, unsafe_allow_html=True)
-            
-            # Handle search form submission
-            if st.session_state.get('search_action') == 'search':
-                st.session_state.search_query = st.session_state.get('search_query', '')
-                st.rerun()
-            elif st.session_state.get('search_action') == 'clear':
-                st.session_state.search_query = ''
-                st.rerun()
+        search = st.text_input("", value=st.session_state.search_query, 
+                              placeholder="Search anime...", 
+                              key="search_input")
+        if search != st.session_state.search_query:
+            st.session_state.search_query = search
+            st.rerun()
     
     with col2:
         if st.button("➕ Add New", key="add_button", use_container_width=True):
@@ -591,8 +616,17 @@ def display_header():
     
     with col3:
         if st.button(f"👤 {st.session_state.username}", key="user_button", use_container_width=True):
-            handle_action("toggle_user_menu", lambda: setattr(st.session_state, 'user_menu_visible', not st.session_state.user_menu_visible))
-
+            st.session_state.user_menu_visible = not st.session_state.user_menu_visible
+    
+    if st.session_state.user_menu_visible:
+        st.markdown("""
+        <div class="user-menu">
+            <div style="font-weight:600; margin-bottom:8px;">User Menu</div>
+            <hr style="margin:8px 0; opacity:0.2;">
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Logout", key="logout_button", use_container_width=True):
+            handle_action("logout", logout)
 
 def main_page():
     """Main application page"""
