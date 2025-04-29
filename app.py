@@ -270,22 +270,34 @@ def load_anime_collection():
         doc_ref = db.collection("users").document(st.session_state.username)
         doc = doc_ref.get()
         if hasattr(doc, 'exists') and doc.exists:
-            st.session_state.anime_collection = doc.to_dict().get("anime_collection", [])
+            anime_collection = doc.to_dict().get("anime_collection", [])
+            for anime in anime_collection:
+                if isinstance(anime.get('image'), str):
+                    try:
+                        anime['image'] = base64.b64decode(anime['image'])
+                    except:
+                        anime['image'] = None
+            st.session_state.anime_collection = anime_collection
         else:
-            # Demo data for new users
-            st.session_state.anime_collection = [
-                {'anime_name': 'Attack on Titan', 'seasons': 4, 'total_episodes': 87, 'finished_episodes': 87, 'image': None},
-                {'anime_name': 'My Hero Academia', 'seasons': 6, 'total_episodes': 138, 'finished_episodes': 75, 'image': None},
-                {'anime_name': 'Demon Slayer', 'seasons': 3, 'total_episodes': 55, 'finished_episodes': 55, 'image': None},
-                {'anime_name': 'Jujutsu Kaisen', 'seasons': 2, 'total_episodes': 36, 'finished_episodes': 0, 'image': None}
-            ]
-            save_anime_collection()
+            st.session_state.anime_collection = []
+
+
+import base64
 
 def save_anime_collection():
     """Save anime collection to database"""
     if st.session_state.username:
+        # Before saving, encode any image bytes to base64 strings
+        anime_collection_serializable = []
+        for anime in st.session_state.anime_collection:
+            anime_copy = anime.copy()
+            if isinstance(anime_copy.get('image'), bytes):
+                anime_copy['image'] = base64.b64encode(anime_copy['image']).decode('utf-8')
+            anime_collection_serializable.append(anime_copy)
+        
         doc_ref = db.collection("users").document(st.session_state.username)
-        doc_ref.set({"anime_collection": st.session_state.anime_collection})
+        doc_ref.set({"anime_collection": anime_collection_serializable})
+
 
 def save_anime_data(anime_data, edit_index=None):
     """Save new or edited anime data"""
