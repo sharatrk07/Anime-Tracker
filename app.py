@@ -272,11 +272,13 @@ def load_anime_collection():
         if hasattr(doc, 'exists') and doc.exists:
             anime_collection = doc.to_dict().get("anime_collection", [])
             for anime in anime_collection:
-                if isinstance(anime.get('image'), str):
+                if isinstance(anime.get('image'), str) and anime['image']:
                     try:
                         anime['image'] = base64.b64decode(anime['image'])
                     except:
                         anime['image'] = None
+                else:
+                    anime['image'] = None
             st.session_state.anime_collection = anime_collection
         else:
             st.session_state.anime_collection = []
@@ -287,16 +289,18 @@ import base64
 def save_anime_collection():
     """Save anime collection to database"""
     if st.session_state.username:
-        # Before saving, encode any image bytes to base64 strings
         anime_collection_serializable = []
         for anime in st.session_state.anime_collection:
             anime_copy = anime.copy()
             if isinstance(anime_copy.get('image'), bytes):
                 anime_copy['image'] = base64.b64encode(anime_copy['image']).decode('utf-8')
+            elif anime_copy.get('image') is None:
+                anime_copy['image'] = ""  # Firestore does not accept None
             anime_collection_serializable.append(anime_copy)
-        
+
         doc_ref = db.collection("users").document(st.session_state.username)
         doc_ref.set({"anime_collection": anime_collection_serializable})
+
 
 
 def save_anime_data(anime_data, edit_index=None):
