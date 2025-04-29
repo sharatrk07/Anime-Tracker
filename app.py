@@ -356,6 +356,37 @@ st.markdown("""
             margin: 30px 20px;
         }
     }
+
+    .anime-grid {
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 24px;
+    }
+    
+    .section-header {
+        font-size: 1.8rem; 
+        margin-top: 40px; 
+        margin-bottom: 24px; 
+        border-left: 5px solid #6B46C1; 
+        padding-left: 12px;
+        color: #EAEAEA;
+        font-weight: 700;
+    }
+    
+    .anime-title {
+        font-size: 1.4rem; 
+        font-weight: 700; 
+        margin-bottom: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    @media (max-width: 768px) {
+        .anime-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -534,18 +565,15 @@ def set_view(view_name, **kwargs):
             st.session_state[key] = value
 
 def auth_page():
-    """Display authentication page"""
     st.markdown('<div class="auth-container">', unsafe_allow_html=True)
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
     
-    # Auth tabs
     col1, col2 = st.columns(2)
     if col1.button("Login", key="login_tab_btn", use_container_width=True):
         st.session_state.auth_mode = "login"
     if col2.button("Sign Up", key="signup_tab_btn", use_container_width=True):
         st.session_state.auth_mode = "signup"
     
-    # Login form
     if st.session_state.auth_mode == "login":
         with st.container():
             st.markdown("### Login to Your Account")
@@ -554,9 +582,8 @@ def auth_page():
             
             col1, col2 = st.columns([3, 1])
             with col1:
-                if st.button("Login", key="submit_login", use_container_width=True):
+                if st.button("Sign In", key="submit_login", use_container_width=True):
                     if login_username and login_password:
-                        # In a real app, validate credentials with Firebase Auth
                         st.session_state.logged_in = True
                         st.session_state.username = login_username
                         load_anime_collection()
@@ -565,14 +592,13 @@ def auth_page():
                     else:
                         st.error("Please enter both username and password")
             with col2:
-                if st.button("Guest Login", key="guest_login"):
+                if st.button("Guest", key="guest_login"):
                     st.session_state.logged_in = True
                     st.session_state.username = "guest_user"
                     load_anime_collection()
                     show_toast("Logged in as guest")
                     st.rerun()
     
-    # Signup form
     elif st.session_state.auth_mode == "signup":
         with st.container():
             st.markdown("### Create New Account")
@@ -588,7 +614,6 @@ def auth_page():
                 elif signup_password != signup_confirm:
                     st.error("Passwords do not match")
                 else:
-                    # In a real app, create user in Firebase Auth
                     st.session_state.logged_in = True
                     st.session_state.username = signup_username
                     save_anime_collection()
@@ -596,7 +621,6 @@ def auth_page():
                     st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
-
 def render_anime_card(index, anime):
     """Render an anime card with improved styling"""
     progress = calculate_progress(anime)
@@ -664,13 +688,11 @@ def display_section(title, anime_list):
             render_anime_card(idx, anime)
 
 def display_responsive_section(title, anime_list):
-    """Display a section with responsive grid based on screen size"""
     if not anime_list:
         return
         
     st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
     
-    # For mobile: 1 column, For tablet: 2 columns, For desktop: 3 columns
     st.markdown('<div class="anime-grid">', unsafe_allow_html=True)
     
     for i, (idx, anime) in enumerate(anime_list):
@@ -680,10 +702,8 @@ def display_responsive_section(title, anime_list):
     st.markdown('</div>', unsafe_allow_html=True)
 
 def display_home_view():
-    """Display the home view with anime collection"""
     filtered = filter_anime_collection()
     
-    # If no anime in collection
     if not filtered:
         if st.session_state.search_query:
             st.markdown("""
@@ -701,12 +721,10 @@ def display_home_view():
             """, unsafe_allow_html=True)
         return
         
-    # Sort by status
     watching = [pair for pair in filtered if get_status(pair[1]) == "watching"]
     upcoming = [pair for pair in filtered if get_status(pair[1]) == "upcoming"]
     finished = [pair for pair in filtered if get_status(pair[1]) == "finished"]
     
-    # Display sections
     display_responsive_section("Currently Watching", watching)
     display_responsive_section("Planned to Watch", upcoming)
     display_responsive_section("Completed", finished)
