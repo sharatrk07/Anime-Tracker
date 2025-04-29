@@ -265,7 +265,6 @@ def calculate_progress(anime):
     return int((anime['finished_episodes'] / anime['total_episodes']) * 100)
 
 def load_anime_collection():
-    """Load user's anime collection from database"""
     if st.session_state.username:
         doc_ref = db.collection("users").document(st.session_state.username)
         doc = doc_ref.get()
@@ -275,7 +274,7 @@ def load_anime_collection():
                 if isinstance(anime.get('image'), str) and anime['image']:
                     try:
                         anime['image'] = base64.b64decode(anime['image'])
-                    except:
+                    except Exception:
                         anime['image'] = None
                 else:
                     anime['image'] = None
@@ -287,7 +286,6 @@ def load_anime_collection():
 import base64
 
 def save_anime_collection():
-    """Save anime collection to database"""
     if st.session_state.username:
         anime_collection_serializable = []
         for anime in st.session_state.anime_collection:
@@ -295,7 +293,9 @@ def save_anime_collection():
             if isinstance(anime_copy.get('image'), bytes):
                 anime_copy['image'] = base64.b64encode(anime_copy['image']).decode('utf-8')
             elif anime_copy.get('image') is None:
-                anime_copy['image'] = ""  # Firestore does not accept None
+                anime_copy['image'] = ""  # Must not be None
+            elif isinstance(anime_copy.get('image'), str) and len(anime_copy['image']) > 1000000:
+                anime_copy['image'] = ""  # Remove very large strings
             anime_collection_serializable.append(anime_copy)
 
         doc_ref = db.collection("users").document(st.session_state.username)
@@ -491,7 +491,8 @@ def display_add_view():
                 anime_image = image_file.read()
                 st.image(anime_image, use_container_width=True)
             else:
-                anime_image = anime_data.get('image')
+                anime_image = anime_data.get('image') if isinstance(anime_data.get('image'), bytes) else None
+
                 if anime_image:
                     st.image(anime_image, use_container_width=True)
                 else:
