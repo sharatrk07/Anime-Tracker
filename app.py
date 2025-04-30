@@ -77,15 +77,14 @@ st.markdown("""
 }
 
 .section-header {
-    font-size: 2rem;
-    margin-top: 50px;
-    margin-bottom: 25px;
-    font-weight: 700;
-    color: var(--text-light);
-    position: relative;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--primary);
-    display: inline-block;
+    font-size: 2rem; 
+    margin-top: 45px; 
+    margin-bottom: 28px; 
+    border-left: 5px solid #6B46C1; 
+    padding-left: 15px;
+    color: #EAEAEA;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .section-header::after {
@@ -106,25 +105,28 @@ st.markdown("""
 
 /* Anime Card Styles */
 .anime-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 25px;
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 32px;
+    margin-bottom: 40px;
 }
 
 .anime-card {
-    background-color: var(--bg-card);
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid var(--border);
+    background: linear-gradient(145deg, #1A1A27, #28293D);
+    border-radius: 14px; 
+    overflow: hidden; 
+    border: 1px solid #28293D;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
     transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .anime-card:hover {
     transform: translateY(-5px);
-    border-color: var(--primary);
-    box-shadow: 0 8px 16px rgba(138, 79, 255, 0.3);
+    box-shadow: 0 12px 30px rgba(107, 70, 193, 0.4);
+    border-color: #6B46C1;
 }
 
 .anime-image {
@@ -145,12 +147,14 @@ st.markdown("""
 }
 
 .anime-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin-bottom: 12px;
-    white-space: nowrap;
+    font-size: 1.5rem; 
+    font-weight: 700; 
+    margin-bottom: 14px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #FFFFFF;
+    letter-spacing: -0.3px;
 }
 
 .anime-stats {
@@ -363,6 +367,36 @@ footer {visibility: hidden;}
 .stProgress > div > div > div > div {
     background: linear-gradient(90deg, var(--primary), var(--primary-light));
 }
+
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2.2rem;
+    }
+    
+    .section-header {
+        font-size: 1.5rem;
+    }
+    
+    .anime-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    
+    .auth-container {
+        padding: 20px;
+        margin: 30px 20px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+    .anime-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -524,23 +558,30 @@ def auth_page():
     
     # Login form
     if st.session_state.auth_mode == "login":
-        st.markdown('<h3 style="text-align: center; margin-bottom: 20px;">Welcome Back!</h3>', unsafe_allow_html=True)
-        login_username = st.text_input("Username", key="login_username", 
-                                     placeholder="Enter your username")
-        login_password = st.text_input("Password", type="password", key="login_password",
-                                     placeholder="Enter your password")
+    with st.form("login_form"):
+        st.markdown("### Login to Your Account")
+        login_username = st.text_input("Username", key="login_username", placeholder="Enter your username")
+        login_password = st.text_input("Password", type="password", key="login_password", placeholder="Enter your password")
         
-        login_btn = st.button("Login", key="submit_login", use_container_width=True)
-        
-        if login_btn:
-            if login_username and login_password:
-                with st.spinner("Logging in..."):
-                    # Add a small delay to simulate authentication
-                    time.sleep(0.5)
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            if st.form_submit_button("Login", use_container_width=True):
+                if login_username and login_password:
+                    # In a real app, validate credentials with Firebase Auth
                     st.session_state.logged_in = True
                     st.session_state.username = login_username
                     load_anime_collection()
+                    show_toast(f"Welcome back, {login_username}!")
                     st.rerun()
+                else:
+                    st.error("Please enter both username and password")
+        with col2:
+            if st.form_submit_button("Guest"):
+                st.session_state.logged_in = True
+                st.session_state.username = "guest_user"
+                load_anime_collection()
+                show_toast("Logged in as guest")
+                st.rerun()
             else:
                 st.error("Please enter both username and password")
     
@@ -629,20 +670,28 @@ def render_anime_card(index, anime):
                 use_container_width=True)
 
 # Display anime sections
-def display_section(title, anime_list):
+def display_responsive_section(title, anime_list):
+    """Display a section with responsive grid based on screen size"""
     if not anime_list:
         return
-    
-    st.markdown(f'<div class="section-container">', unsafe_allow_html=True)
+        
     st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
     
-    # Create a responsive grid layout with 2 columns
-    cols = st.columns(2)
-    for i, (idx, anime) in enumerate(anime_list):
-        with cols[i % 2]:
-            render_anime_card(idx, anime)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Create rows of 2 cards each for better spacing control
+    for i in range(0, len(anime_list), 2):
+        st.markdown('<div class="anime-grid">', unsafe_allow_html=True)
+        
+        # Create a row with 2 columns
+        cols = st.columns(2)
+        
+        # Add cards to this row (up to 2)
+        for j in range(2):
+            if i+j < len(anime_list):
+                idx, anime = anime_list[i+j]
+                with cols[j]:
+                    render_anime_card(idx, anime)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # Home view
 def display_home_view():
