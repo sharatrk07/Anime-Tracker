@@ -781,9 +781,6 @@ def display_add_view():
             progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
             
             # Show progress bar
-              * 100 if total_episodes > 0 else 0
-            
-            # Show progress bar
             st.markdown(f"""
             <div style='margin-top:20px;'>
                 <div style='display:flex; justify-content:space-between; margin-bottom:5px;'>
