@@ -99,12 +99,6 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    @media (min-width: 992px) {
-        .anime-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    
     .anime-card {
         background: linear-gradient(145deg, #1A1A27, #28293D);
         border-radius: 12px; 
@@ -115,8 +109,8 @@ st.markdown("""
     }
     
     .anime-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(107, 70, 193, 0.3);
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(107, 70, 193, 0.4);
         border-color: #6B46C1;
     }
     
@@ -125,6 +119,11 @@ st.markdown("""
         background-size: cover; 
         background-position: center;
         position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .anime-card:hover .anime-image {
+        filter: brightness(1.1);
     }
     
     .anime-image-overlay {
@@ -147,6 +146,7 @@ st.markdown("""
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        color: #FFFFFF;
     }
     
     .anime-stats {
@@ -170,6 +170,12 @@ st.markdown("""
         font-weight: 600;
         letter-spacing: 0.5px;
         box-shadow: 0 3px 10px rgba(107, 70, 193, 0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .anime-card:hover .status-badge {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(107, 70, 193, 0.6);
     }
     
     .badge-watching {
@@ -196,6 +202,7 @@ st.markdown("""
         height: 8px; 
         background: linear-gradient(90deg, #6B46C1, #D53F8C);
         border-radius: 999px;
+        transition: width 0.5s ease;
     }
     
     /* Forms and inputs */
@@ -205,11 +212,12 @@ st.markdown("""
         border: 1px solid #2D2D3D;
         border-radius: 8px;
         padding: 10px;
+        transition: all 0.3s ease;
     }
     
     .stTextInput > div > div > input:focus {
         border-color: #6B46C1;
-        box-shadow: 0 0 0 1px #6B46C1;
+        box-shadow: 0 0 0 2px rgba(107, 70, 193, 0.3);
     }
     
     .stFileUploader > div {
@@ -217,6 +225,12 @@ st.markdown("""
         border: 1px dashed #6B46C1;
         border-radius: 8px;
         padding: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .stFileUploader > div:hover {
+        background-color: #28293D;
+        border-color: #805AD5;
     }
     
     /* Button styling */
@@ -236,6 +250,11 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(107, 70, 193, 0.4);
     }
     
+    .stButton>button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(107, 70, 193, 0.4);
+    }
+    
     /* Auth container */
     .auth-container {
         max-width: 500px;
@@ -244,6 +263,11 @@ st.markdown("""
         background: linear-gradient(145deg, #1A1A27, #28293D);
         border-radius: 16px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .auth-container:hover {
+        box-shadow: 0 15px 40px rgba(107, 70, 193, 0.3);
     }
     
     .auth-tab {
@@ -282,6 +306,12 @@ st.markdown("""
         z-index: 1000;
         min-width: 150px;
         border: 1px solid #2D2D3D;
+        animation: fadeIn 0.2s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
     .user-menu-item {
@@ -292,6 +322,7 @@ st.markdown("""
     
     .user-menu-item:hover {
         background-color: #2D2D3D;
+        color: #6B46C1;
     }
     
     /* Loading */
@@ -672,9 +703,9 @@ def display_section(title, anime_list):
     st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
     
     # Create a responsive grid
-    cols = st.columns([1, 1, 1])
+    cols = st.columns([1, 1])
     for i, (idx, anime) in enumerate(anime_list):
-        with cols[i % 3]:
+        with cols[i % 2]:
             render_anime_card(idx, anime)
 
 def display_responsive_section(title, anime_list):
@@ -684,7 +715,7 @@ def display_responsive_section(title, anime_list):
         
     st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
     
-    # For mobile: 1 column, For tablet: 2 columns, For desktop: 3 columns
+    # For mobile: 1 column, For tablet/desktop: 2 columns
     st.markdown('<div class="anime-grid">', unsafe_allow_html=True)
     
     for i, (idx, anime) in enumerate(anime_list):
