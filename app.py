@@ -5,6 +5,7 @@ import base64
 import time
 import io
 
+# Session state initialization
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'username' not in st.session_state:
@@ -89,10 +90,15 @@ st.markdown("""
     }
     
     .anime-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        display: flex;
+        flex-wrap: wrap;
         gap: 30px;
         width: 100%;
+    }
+    
+    .anime-card-wrapper {
+        flex: 0 0 calc(50% - 15px);
+        margin-bottom: 20px;
     }
     
     .anime-card {
@@ -205,6 +211,20 @@ st.markdown("""
         background: linear-gradient(90deg, #6B46C1, #D53F8C);
         border-radius: 999px;
         transition: width 0.5s ease;
+    }
+    
+    .card-actions {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .card-action-btn {
+        flex: 1;
+    }
+    
+    .card-action-btn button {
+        width: 100%;
     }
     
     .stTextInput > div > div > input {
@@ -375,10 +395,6 @@ st.markdown("""
         to { transform: translateX(0); }
     }
     
-    .card-actions {
-        margin-top: auto;
-    }
-    
     @media (max-width: 768px) {
         .page-title {
             font-size: 2.2rem;
@@ -388,8 +404,8 @@ st.markdown("""
             font-size: 1.5rem;
         }
         
-        .anime-grid {
-            grid-template-columns: 1fr;
+        .anime-card-wrapper {
+            flex: 0 0 100%;
         }
         
         .auth-container {
@@ -397,20 +413,6 @@ st.markdown("""
             margin: 30px 20px;
         }
     }
-
-    .anime-card-wrapper {
-    display: block;
-}
-.anime-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-}
-.anime-card {
-    flex: 1 1 calc(50% - 30px);
-    max-width: calc(50% - 30px);
-}
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -664,20 +666,33 @@ def render_anime_card(index, anime):
     """
     st.markdown(card_html, unsafe_allow_html=True)
     
+    # Card actions with improved layout
+    st.markdown('<div class="card-actions">', unsafe_allow_html=True)
+    
     col1, col2, col3 = st.columns([2, 2, 1])
     with col1:
+        st.markdown('<div class="card-action-btn">', unsafe_allow_html=True)
         if st.button("✏️ Edit", key=f"edit_{index}", on_click=lambda: handle_action(f"edit_{index}", set_view, 'add', edit_index=index), use_container_width=True):
             pass
+        st.markdown('</div>', unsafe_allow_html=True)
+        
     with col2:
+        st.markdown('<div class="card-action-btn">', unsafe_allow_html=True)
         if st.button("🗑️ Delete", key=f"delete_{index}", on_click=lambda: handle_action(f"delete_{index}", delete_anime, index), use_container_width=True):
             pass
+        st.markdown('</div>', unsafe_allow_html=True)
+        
     with col3:
+        st.markdown('<div class="card-action-btn">', unsafe_allow_html=True)
         if status == "watching" and anime['finished_episodes'] < anime['total_episodes']:
             if st.button("➕", key=f"add_ep_{index}", help="Add episode watched"):
                 anime_copy = anime.copy()
                 anime_copy['finished_episodes'] = min(anime_copy['finished_episodes'] + 1, anime_copy['total_episodes'])
                 save_anime_data(anime_copy, index)
                 st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def display_responsive_section(title, anime_list):
     if not anime_list:
@@ -692,7 +707,6 @@ def display_responsive_section(title, anime_list):
         st.markdown('<div class="anime-card-wrapper">', unsafe_allow_html=True)
         render_anime_card(idx, anime)
         st.markdown('</div>', unsafe_allow_html=True)
-
     
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -779,17 +793,16 @@ def display_add_view():
             progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
             
             st.markdown(f"""
-                <div style='margin-top:20px;'>
-                    <div style='display:flex; justify-content:space-between; margin-bottom:5px;'>
-                        <span>Progress</span>
-                        <span>{progress:.1f}%</span>
-                    </div>
-                    <div class='progress-container'>
-                        <div class='progress-bar' style='width:{progress}%;'></div>
-                    </div>
+            <div style='margin-top:20px;'>
+                <div style='display:flex; justify-content:space-between; margin-bottom:5px;'>
+                    <span>Progress</span>
+                    <span>{progress:.1f}%</span>
                 </div>
+                <div class='progress-container'>
+                    <div class='progress-bar' style='width:{progress}%;'></div>
+                </div>
+            </div>
             """, unsafe_allow_html=True)
-
         
         col_cancel, col_save = st.columns([1, 2])
         with col_cancel:
@@ -840,13 +853,13 @@ def display_header():
             st.session_state.user_menu_visible = not st.session_state.user_menu_visible
     
     if st.session_state.user_menu_visible:
-        st.markdown('''
+        st.markdown("""
         <div class="user-menu">
             <div class="user-menu-item" onclick="document.getElementById('logout_button').click();">
                 Logout
             </div>
         </div>
-        ''', unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
         
         if st.button("Logout", key="logout_button", help="Logout from your account"):
             handle_action("logout", logout)
@@ -854,13 +867,13 @@ def display_header():
 def render_toasts():
     if st.session_state.toasts:
         for i, toast in enumerate(st.session_state.toasts):
-            st.markdown(f'''
-                <div class="toast toast-{toast['type']}" style="bottom: {20 + i*60}px">
-                    {toast['message']}
-                </div>
-            ''', unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="toast toast-{toast['type']}" style="bottom: {20 + i*60}px">
+                {toast['message']}
+            </div>
+            """, unsafe_allow_html=True)
+        
         st.session_state.toasts = []
-
 
 def main_page():
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
