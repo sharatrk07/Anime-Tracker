@@ -75,6 +75,7 @@ st.markdown("""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         letter-spacing: -0.5px;
+        text-shadow: 0 2px 10px rgba(107, 70, 193, 0.2);
     }
     
     .section-header {
@@ -92,7 +93,8 @@ st.markdown("""
     .anime-grid {
         display: grid; 
         grid-template-columns: repeat(2, 1fr); 
-        gap: 24px;
+        gap: 30px;
+        margin-bottom: 40px;
     }
     
     .anime-grid > div {
@@ -106,6 +108,7 @@ st.markdown("""
         border: 1px solid #28293D;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         transition: all 0.3s ease;
+        height: 100%;
     }
     
     .anime-card:hover {
@@ -694,19 +697,6 @@ def render_anime_card(index, anime):
                 anime_copy['finished_episodes'] = min(anime_copy['finished_episodes'] + 1, anime_copy['total_episodes'])
                 save_anime_data(anime_copy, index)
                 st.rerun()
-
-def display_section(title, anime_list):
-    """Display a section of anime cards"""
-    if not anime_list:
-        return
-        
-    st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
-    
-    # Create a responsive grid
-    cols = st.columns([1, 1])
-    for i, (idx, anime) in enumerate(anime_list):
-        with cols[i % 2]:
-            render_anime_card(idx, anime)
 
 def display_responsive_section(title, anime_list):
     """Display a section with responsive grid based on screen size"""
