@@ -408,6 +408,41 @@ st.markdown("""
             margin: 30px 20px;
         }
     }
+
+    .anime-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: space-between;
+}
+
+.anime-card-column {
+    flex: 0 0 calc(50% - 12px);
+    max-width: calc(50% - 12px);
+}
+
+@media (max-width: 768px) {
+    .anime-card-column {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.card-action-btn {
+    flex: 1;
+}
+
+.card-action-btn .stButton {
+    width: 100%;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -698,30 +733,17 @@ def render_anime_card(index, anime):
 def display_responsive_section(title, anime_list):
     if not anime_list:
         return
-        
-    st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
-    
-    # Improved responsive grid container
-    st.markdown('<div class="anime-grid-container">', unsafe_allow_html=True)
-    st.markdown("""
-    <div class="anime-grid" style="
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-        width: 100%;
-    ">
-    """, unsafe_allow_html=True)
-    
-    for i, (idx, anime) in enumerate(anime_list):
-        st.markdown(f"""<div class="anime-card-column">""", unsafe_allow_html=True)
-        render_anime_card(idx, anime)
-        st.markdown("</div>", unsafe_allow_html=True)
 
+    st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
+    st.markdown('<div class="anime-grid">', unsafe_allow_html=True)
+
+    for i, (idx, anime) in enumerate(anime_list):
+        st.markdown('<div class="anime-card-column">', unsafe_allow_html=True)
         render_anime_card(idx, anime)
         st.markdown('</div>', unsafe_allow_html=True)
-    
+
     st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+
 
 def display_home_view():
     filtered = filter_anime_collection()
