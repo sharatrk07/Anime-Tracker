@@ -5,7 +5,6 @@ import base64
 import time
 import io
 
-# Session state initialization
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'username' not in st.session_state:
@@ -31,7 +30,6 @@ if 'pending_action' not in st.session_state:
 if 'toasts' not in st.session_state:
     st.session_state.toasts = []
 
-# Page configuration
 st.set_page_config(
     page_title="Anime Tracker", 
     page_icon="🎬", 
@@ -39,17 +37,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS with improved styling
 st.markdown("""
 <style>
-    /* Main theme */
     .stApp {
         background-color: #0F0F13; 
         color: #EAEAEA; 
         font-family: 'Poppins', sans-serif;
     }
     
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -65,7 +60,6 @@ st.markdown("""
         background: #805AD5;
     }
     
-    /* Headers */
     .page-title {
         font-size: 3rem; 
         font-weight: 700; 
@@ -89,16 +83,16 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
-    /* Cards */
-    .anime-grid {
-        display: grid; 
-        grid-template-columns: repeat(2, 1fr); 
-        gap: 30px;
+    .anime-grid-container {
+        padding: 0 10px;
         margin-bottom: 40px;
     }
     
-    .anime-grid > div {
-        margin-bottom: 20px;
+    .anime-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        width: 100%;
     }
     
     .anime-card {
@@ -109,6 +103,8 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         transition: all 0.3s ease;
         height: 100%;
+        display: flex;
+        flex-direction: column;
     }
     
     .anime-card:hover {
@@ -140,6 +136,9 @@ st.markdown("""
     
     .anime-card-content {
         padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
     }
     
     .anime-title {
@@ -208,7 +207,6 @@ st.markdown("""
         transition: width 0.5s ease;
     }
     
-    /* Forms and inputs */
     .stTextInput > div > div > input {
         background-color: #1A1A27;
         color: #EAEAEA;
@@ -236,7 +234,6 @@ st.markdown("""
         border-color: #805AD5;
     }
     
-    /* Button styling */
     .stButton>button {
         background: linear-gradient(90deg, #6B46C1, #805AD5);
         color: white;
@@ -258,7 +255,6 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(107, 70, 193, 0.4);
     }
     
-    /* Auth container */
     .auth-container {
         max-width: 500px;
         margin: 60px auto;
@@ -280,7 +276,6 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* Search */
     .search-container {
         position: relative;
         margin-bottom: 20px;
@@ -298,7 +293,6 @@ st.markdown("""
         font-size: 18px;
     }
     
-    /* User menu */
     .user-menu {
         position: absolute;
         right: 20px;
@@ -328,7 +322,6 @@ st.markdown("""
         color: #6B46C1;
     }
     
-    /* Loading */
     .loading-overlay {
         position: fixed;
         top: 0;
@@ -356,7 +349,6 @@ st.markdown("""
         100% { transform: rotate(360deg); }
     }
     
-    /* Toast messages */
     .toast {
         position: fixed;
         bottom: 20px;
@@ -383,7 +375,10 @@ st.markdown("""
         to { transform: translateX(0); }
     }
     
-    /* Mobile responsiveness */
+    .card-actions {
+        margin-top: auto;
+    }
+    
     @media (max-width: 768px) {
         .page-title {
             font-size: 2.2rem;
@@ -405,24 +400,19 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Helper functions for image processing
 def process_image(image_data):
-    """Process and resize images to prevent size issues"""
     if not image_data:
         return None
         
     try:
-        # Convert to PIL Image
         if isinstance(image_data, bytes):
             img = Image.open(io.BytesIO(image_data))
         else:
             return None
             
-        # Resize to reasonable dimensions while maintaining aspect ratio
         max_size = (800, 600)
         img.thumbnail(max_size, Image.LANCZOS)
         
-        # Convert to JPEG with reduced quality
         output = io.BytesIO()
         img.convert('RGB').save(output, format='JPEG', quality=85)
         return output.getvalue()
@@ -431,7 +421,6 @@ def process_image(image_data):
         return None
 
 def image_to_base64(image_bytes):
-    """Convert image bytes to base64 string"""
     if not image_bytes:
         return None
     try:
@@ -440,7 +429,6 @@ def image_to_base64(image_bytes):
         return None
 
 def base64_to_bytes(base64_str):
-    """Convert base64 string to bytes"""
     if not base64_str:
         return None
     try:
@@ -448,13 +436,10 @@ def base64_to_bytes(base64_str):
     except:
         return None
 
-# Toast notification system
 def show_toast(message, type="success"):
-    """Show a toast notification"""
     st.session_state.toasts.append({"message": message, "type": type})
 
 def handle_action(action_name, callback_func, *args, **kwargs):
-    """Handle actions with debounce to prevent duplicate submissions"""
     current_time = time.time()
     if current_time - st.session_state.last_action_time > 0.5:
         st.session_state.last_action_time = current_time
@@ -462,7 +447,6 @@ def handle_action(action_name, callback_func, *args, **kwargs):
         st.rerun()
 
 def filter_anime_collection():
-    """Filter anime collection based on search query"""
     filtered = []
     for idx, anime in enumerate(st.session_state.anime_collection):
         if not st.session_state.search_query or st.session_state.search_query.lower() in anime['anime_name'].lower():
@@ -470,7 +454,6 @@ def filter_anime_collection():
     return filtered
 
 def get_status(anime):
-    """Get status of an anime based on episode progress"""
     if anime['finished_episodes'] == 0:
         return "upcoming"
     elif anime['finished_episodes'] >= anime['total_episodes']:
@@ -479,13 +462,11 @@ def get_status(anime):
         return "watching"
 
 def calculate_progress(anime):
-    """Calculate progress percentage"""
     if anime['total_episodes'] == 0:
         return 0
     return int((anime['finished_episodes'] / anime['total_episodes']) * 100)
 
 def load_anime_collection():
-    """Load anime collection from Firebase"""
     try:
         if st.session_state.username:
             doc_ref = db.collection("users").document(st.session_state.username)
@@ -508,7 +489,6 @@ def load_anime_collection():
         st.session_state.anime_collection = []
 
 def save_anime_collection():
-    """Save anime collection to Firebase"""
     try:
         if st.session_state.username:
             anime_collection_serializable = []
@@ -528,7 +508,6 @@ def save_anime_collection():
         return False
 
 def save_anime_data(anime_data, edit_index=None):
-    """Save or update anime data"""
     try:
         if edit_index is not None:
             st.session_state.anime_collection[edit_index] = anime_data
@@ -548,7 +527,6 @@ def save_anime_data(anime_data, edit_index=None):
         show_toast(f"Error: {str(e)}", "error")
 
 def delete_anime(index):
-    """Delete anime from collection"""
     try:
         anime_name = st.session_state.anime_collection[index]['anime_name']
         st.session_state.anime_collection.pop(index)
@@ -561,7 +539,6 @@ def delete_anime(index):
         show_toast(f"Error: {str(e)}", "error")
 
 def logout():
-    """Logout user and clear session state"""
     st.session_state.logged_in = False
     st.session_state.username = ""
     st.session_state.view = 'home'
@@ -573,25 +550,21 @@ def logout():
     st.set_query_params({})
 
 def set_view(view_name, **kwargs):
-    """Set current view and update session state"""
     st.session_state.view = view_name
     for key, value in kwargs.items():
         if key in st.session_state:
             st.session_state[key] = value
 
 def auth_page():
-    """Display authentication page"""
     st.markdown('<div class="auth-container">', unsafe_allow_html=True)
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
     
-    # Auth tabs
     col1, col2 = st.columns(2)
     if col1.button("Login", key="login_tab_btn", use_container_width=True):
         st.session_state.auth_mode = "login"
     if col2.button("Sign Up", key="signup_tab_btn", use_container_width=True):
         st.session_state.auth_mode = "signup"
     
-    # Login form
     if st.session_state.auth_mode == "login":
         with st.container():
             st.markdown("### Login to Your Account")
@@ -603,7 +576,6 @@ def auth_page():
                 login_button = st.button("Login", key="submit_login", use_container_width=True)
                 if login_button:
                     if login_username and login_password:
-                        # In a real app, validate credentials with Firebase Auth
                         st.session_state.logged_in = True
                         st.session_state.username = login_username
                         load_anime_collection()
@@ -620,7 +592,6 @@ def auth_page():
                     show_toast("Logged in as guest")
                     st.rerun()
     
-    # Signup form
     elif st.session_state.auth_mode == "signup":
         with st.container():
             st.markdown("### Create New Account")
@@ -636,7 +607,6 @@ def auth_page():
                 elif signup_password != signup_confirm:
                     st.error("Passwords do not match")
                 else:
-                    # In a real app, create user in Firebase Auth
                     st.session_state.logged_in = True
                     st.session_state.username = signup_username
                     save_anime_collection()
@@ -646,13 +616,11 @@ def auth_page():
     st.markdown('</div>', unsafe_allow_html=True)
 
 def render_anime_card(index, anime):
-    """Render an anime card with improved styling"""
     progress = calculate_progress(anime)
     status = get_status(anime)
     status_text = {"watching": "Watching", "finished": "Completed", "upcoming": "Planned"}[status]
     status_class = {"watching": "badge-watching", "finished": "badge-finished", "upcoming": "badge-upcoming"}[status]
     
-    # Handle image display
     image_url = "/api/placeholder/400/180"
     if anime.get('image'):
         try:
@@ -682,7 +650,6 @@ def render_anime_card(index, anime):
     """
     st.markdown(card_html, unsafe_allow_html=True)
     
-    # Card actions
     col1, col2, col3 = st.columns([2, 2, 1])
     with col1:
         if st.button("✏️ Edit", key=f"edit_{index}", on_click=lambda: handle_action(f"edit_{index}", set_view, 'add', edit_index=index), use_container_width=True):
@@ -699,13 +666,12 @@ def render_anime_card(index, anime):
                 st.rerun()
 
 def display_responsive_section(title, anime_list):
-    """Display a section with responsive grid based on screen size"""
     if not anime_list:
         return
         
     st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
     
-    # For mobile: 1 column, For tablet/desktop: 2 columns
+    st.markdown('<div class="anime-grid-container">', unsafe_allow_html=True)
     st.markdown('<div class="anime-grid">', unsafe_allow_html=True)
     
     for i, (idx, anime) in enumerate(anime_list):
@@ -713,12 +679,11 @@ def display_responsive_section(title, anime_list):
             render_anime_card(idx, anime)
     
     st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def display_home_view():
-    """Display the home view with anime collection"""
     filtered = filter_anime_collection()
     
-    # If no anime in collection
     if not filtered:
         if st.session_state.search_query:
             st.markdown("""
@@ -736,18 +701,15 @@ def display_home_view():
             """, unsafe_allow_html=True)
         return
         
-    # Sort by status
     watching = [pair for pair in filtered if get_status(pair[1]) == "watching"]
     upcoming = [pair for pair in filtered if get_status(pair[1]) == "upcoming"]
     finished = [pair for pair in filtered if get_status(pair[1]) == "finished"]
     
-    # Display sections
     display_responsive_section("Currently Watching", watching)
     display_responsive_section("Planned to Watch", upcoming)
     display_responsive_section("Completed", finished)
 
 def display_add_view():
-    """Display add/edit anime form"""
     is_edit = st.session_state.edit_index is not None
     anime_data = st.session_state.anime_collection[st.session_state.edit_index] if is_edit else {
         'anime_name': '', 'seasons': 1, 'total_episodes': 12, 'finished_episodes': 0, 'image': None
@@ -763,7 +725,6 @@ def display_add_view():
             
             if image_file:
                 anime_image = image_file.read()
-                # Process the image to reduce size
                 processed_image = process_image(anime_image)
                 if processed_image:
                     st.image(processed_image, use_container_width=True)
@@ -801,7 +762,6 @@ def display_add_view():
             
             progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
             
-            # Show progress bar
             st.markdown(f"""
             <div style='margin-top:20px;'>
                 <div style='display:flex; justify-content:space-between; margin-bottom:5px;'>
@@ -812,9 +772,11 @@ def display_add_view():
                     <div class='progress-bar' style='width:{progress}%;'></div>
                 </div>
             </div>
+            """,  style='width:{progress}%;'></div>
+                </div>
+            </div>
             """, unsafe_allow_html=True)
         
-        # Form buttons
         col_cancel, col_save = st.columns([1, 2])
         with col_cancel:
             if st.form_submit_button("Cancel", use_container_width=True):
@@ -840,11 +802,9 @@ def display_add_view():
                     st.rerun()
 
 def display_header():
-    """Display app header with search and user controls"""
     col1, col2, col3 = st.columns([4, 1, 1])
     
     with col1:
-        # Search input with clear button
         search_container = st.container()
         search = st.text_input("", value=st.session_state.search_query, 
                               placeholder="Search your anime collection...", 
@@ -865,7 +825,6 @@ def display_header():
         if st.button(f"👤 {st.session_state.username}", key="user_button", use_container_width=True):
             st.session_state.user_menu_visible = not st.session_state.user_menu_visible
     
-    # User menu dropdown
     if st.session_state.user_menu_visible:
         st.markdown("""
         <div class="user-menu">
@@ -875,12 +834,10 @@ def display_header():
         </div>
         """, unsafe_allow_html=True)
         
-        # Hidden button to handle click
         if st.button("Logout", key="logout_button", help="Logout from your account"):
             handle_action("logout", logout)
 
 def render_toasts():
-    """Render toast notifications"""
     if st.session_state.toasts:
         for i, toast in enumerate(st.session_state.toasts):
             st.markdown(f"""
@@ -889,26 +846,20 @@ def render_toasts():
             </div>
             """, unsafe_allow_html=True)
         
-        # Clear toasts after display
         st.session_state.toasts = []
 
 def main_page():
-    """Main page rendering"""
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
     
-    # Display header with search and user menu
     display_header()
     
-    # Display current view
     if st.session_state.view == 'home':
         display_home_view()
     elif st.session_state.view == 'add':
         display_add_view()
     
-    # Display toast notifications
     render_toasts()
 
-# Main app flow
 if not st.session_state.logged_in:
     auth_page()
 else:
