@@ -46,9 +46,12 @@ st.markdown("""
     --primary: #8A4FFF;
     --primary-light: #9D6FFF;
     --primary-dark: #7A3FEF;
-    --secondary: #FF4F8A;
-    --secondary-light: #FF6B9E;
-    --secondary-dark: #E63A75;
+    --secondary: #4F9DFF;
+    --secondary-light: #6BABFF;
+    --secondary-dark: #3A7FE6;
+    --accent: #4FFFB0;
+    --accent-light: #6FFFC1;
+    --accent-dark: #3AE69A;
     --bg-dark: #121212;
     --bg-card: #1E1E1E;
     --bg-input: #2D2D2D;
@@ -118,13 +121,30 @@ st.markdown("""
     width: 100%;
 }
 
+/* Enhanced category line styling */
+.category-line {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+    margin: 15px 0 30px 0;
+    border-radius: 3px;
+    box-shadow: 0 2px 10px rgba(138, 79, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.category-line:hover {
+    height: 5px;
+    box-shadow: 0 4px 15px rgba(138, 79, 255, 0.4);
+}
+
 .section-container {
     margin-bottom: 50px;
     padding-bottom: 30px;
     border-bottom: 1px solid var(--border);
 }
 
-/* Improved Anime Card Styles */
+/* Improved Anime Card Styles with increased spacing */
 .anime-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -168,7 +188,7 @@ st.markdown("""
 .anime-title {
     font-size: 1.6rem;
     font-weight: 700;
-    margin-bottom: 15px;
+    margin-bottom: 20px; /* Increased spacing */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -183,7 +203,8 @@ st.markdown("""
     display: flex;
     justify-content: space-between;
     font-size: 1rem;
-    margin-top: 15px;
+    margin-top: 20px; /* Increased spacing */
+    margin-bottom: 20px; /* Increased spacing */
     color: var(--text-muted);
 }
 
@@ -224,7 +245,8 @@ st.markdown("""
     background-color: var(--bg-input);
     border-radius: 999px;
     overflow: hidden;
-    margin-top: 15px;
+    margin-top: 20px; /* Increased spacing */
+    margin-bottom: 15px; /* Increased spacing */
     height: 10px;
 }
 
@@ -234,11 +256,11 @@ st.markdown("""
     transition: width 0.8s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-/* Enhanced Button Styles */
+/* Enhanced Button Styles with new hover effects */
 .action-buttons {
     display: flex;
     gap: 15px;
-    margin-top: 20px;
+    margin-top: 25px; /* Increased spacing */
 }
 
 .action-button {
@@ -258,24 +280,45 @@ st.markdown("""
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.edit-button {
-    background-color: var(--primary-dark);
+/* New button hover styles */
+.stButton > button {
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    padding: 12px 24px;
+    font-size: 1.05rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.edit-button:hover {
+.stButton > button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    background-color: var(--primary);
+    color: white;
+}
+
+/* Edit button */
+div[data-testid="stHorizontalBlock"] > div:nth-child(1) .stButton > button {
+    background-color: var(--primary-dark);
+    color: white;
+}
+
+div[data-testid="stHorizontalBlock"] > div:nth-child(1) .stButton > button:hover {
     background-color: var(--primary);
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(138, 79, 255, 0.3);
 }
 
-.delete-button {
+/* Delete button */
+div[data-testid="stHorizontalBlock"] > div:nth-child(2) .stButton > button {
     background-color: var(--secondary-dark);
+    color: white;
 }
 
-.delete-button:hover {
+div[data-testid="stHorizontalBlock"] > div:nth-child(2) .stButton > button:hover {
     background-color: var(--secondary);
     transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(255, 79, 138, 0.3);
+    box-shadow: 0 6px 12px rgba(79, 157, 255, 0.3);
 }
 
 /* Enhanced Form Styles */
@@ -295,20 +338,6 @@ st.markdown("""
     border-color: var(--primary);
     box-shadow: 0 0 0 2px rgba(138, 79, 255, 0.3);
     transform: translateY(-2px);
-}
-
-.stButton > button {
-    border-radius: 12px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    padding: 12px 24px;
-    font-size: 1.05rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.stButton > button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Enhanced Auth Styles */
@@ -347,6 +376,7 @@ st.markdown("""
 .auth-tab:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    background-color: var(--primary);
 }
 
 /* Enhanced Search Bar */
@@ -470,16 +500,6 @@ st.markdown("""
     border-color: var(--primary);
     box-shadow: 0 10px 20px rgba(138, 79, 255, 0.2);
     transform: translateY(-5px);
-}
-
-.empty-state-image {
-    max-width: 220px;
-    margin-bottom: 25px;
-    transition: transform 0.5s ease;
-}
-
-.empty-state:hover .empty-state-image {
-    transform: scale(1.1);
 }
 
 .empty-state-title {
@@ -773,10 +793,12 @@ def set_view(view_name, **kwargs):
         if key in st.session_state:
             st.session_state[key] = value
 
-# Enhanced Authentication page
+# Enhanced Authentication page - removed image
 def auth_page():
     st.markdown('<div class="auth-container">', unsafe_allow_html=True)
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
+    
+    # Removed image as requested
     
     # Tabs for login/signup with enhanced styling
     col1, col2 = st.columns(2)
@@ -797,7 +819,7 @@ def auth_page():
     
     # Login form with enhanced styling
     if st.session_state.auth_mode == "login":
-        st.markdown('<h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem; background: linear-gradient(90deg, #8A4FFF, #FF4F8A); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Welcome Back!</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem; background: linear-gradient(90deg, #8A4FFF, #4F9DFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Welcome Back!</h3>', unsafe_allow_html=True)
         login_username = st.text_input("Username", key="login_username", 
                                      placeholder="Enter your username")
         login_password = st.text_input("Password", type="password", key="login_password",
@@ -818,7 +840,7 @@ def auth_page():
     
     # Signup form with enhanced styling
     elif st.session_state.auth_mode == "signup":
-        st.markdown('<h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem; background: linear-gradient(90deg, #8A4FFF, #FF4F8A); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Create Your Account</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem; background: linear-gradient(90deg, #8A4FFF, #4F9DFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Create Your Account</h3>', unsafe_allow_html=True)
         signup_username = st.text_input("Username", key="signup_username", 
                                       placeholder="Choose a username")
         signup_password = st.text_input("Password", type="password", key="signup_password",
@@ -846,7 +868,7 @@ def auth_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Enhanced anime card rendering
+# Enhanced anime card rendering with increased spacing
 def render_anime_card(index, anime):
     progress = calculate_progress(anime)
     status = get_status(anime)
@@ -865,7 +887,7 @@ def render_anime_card(index, anime):
         except:
             pass
     
-    # Create the anime card with enhanced styling
+    # Create the anime card with enhanced spacing
     card_html = f"""
     <div class="anime-card">
         <div class="anime-image" style="background-image: url('{image_url if image_url else ""}'); background-color: #000000;">
@@ -880,7 +902,7 @@ def render_anime_card(index, anime):
             <div class="progress-container">
                 <div class="progress-bar" style="width: {progress}%;"></div>
             </div>
-            <div style="text-align:center; margin-top:12px; font-size: 1rem; color: #AAAAAA;">
+            <div style="text-align:center; margin-top:15px; margin-bottom:15px; font-size: 1rem; color: #AAAAAA;">
                 {progress}% complete
             </div>
         </div>
@@ -901,7 +923,7 @@ def render_anime_card(index, anime):
                 use_container_width=True,
                 help="Delete this anime from your collection")
 
-# Display anime sections with enhanced styling
+# Display anime sections with enhanced category styling
 def display_section(title, anime_list):
     if not anime_list:
         return
@@ -917,6 +939,9 @@ def display_section(title, anime_list):
     
     st.markdown(f'<h2 class="section-header">{category_icon} {title}</h2>', unsafe_allow_html=True)
     
+    # Add category line effect
+    st.markdown(f'<div class="category-line"></div>', unsafe_allow_html=True)
+    
     # Create a responsive grid layout with better spacing
     cols = st.columns(2)
     for i, (idx, anime) in enumerate(anime_list):
@@ -930,6 +955,13 @@ def display_home_view():
     filtered = filter_anime_collection()
     
     if not filtered:
+        st.markdown("""
+        <div class="empty-state">
+            <h3 class="empty-state-title">Your anime collection is empty</h3>
+            <p class="empty-state-text">Start tracking your favorite anime by adding them to your collection.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
         if st.button("➕ Add Your First Anime", key="add_first", use_container_width=True):
             handle_action("add_first", set_view, 'add', edit_index=None)
         return
@@ -956,6 +988,7 @@ def display_add_view():
     }
     
     st.markdown(f'<h2 class="section-header">{"✏️ Edit" if is_edit else "➕ Add New"} Anime</h2>', unsafe_allow_html=True)
+    st.markdown(f'<div class="category-line"></div>', unsafe_allow_html=True)
     
     with st.form("anime_form", clear_on_submit=False):
         col_img, col_form = st.columns([1, 2])
@@ -1003,7 +1036,7 @@ def display_add_view():
             
             progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
             st.markdown(f"""
-            <div style="margin-top:20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="margin-top:20px; margin-bottom:10px; display: flex; justify-content: space-between; align-items: center;">
                 <span style="font-size: 1.1rem;">Progress:</span>
                 <span style="font-weight: 600; color: #8A4FFF; font-size: 1.1rem;">{progress:.1f}%</span>
             </div>
@@ -1038,7 +1071,7 @@ def display_add_view():
             st.session_state.edit_index = None
             st.rerun()
 
-# Enhanced header with search and user menu
+# Enhanced header with search and user menu - removed image
 def display_header():
     col1, col2, col3 = st.columns([6, 1, 1])
     
