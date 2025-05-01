@@ -982,9 +982,9 @@ def display_section(title, anime_list):
 def display_home_view():
     filtered = filter_anime_collection()
         
-        if st.button("➕ Add Your First Anime", key="add_first", use_container_width=True):
-            handle_action("add_first", set_view, 'add', edit_index=None)
-        return
+    if st.button("➕ Add Your First Anime", key="add_first", use_container_width=True):
+        handle_action("add_first", set_view, 'add', edit_index=None)
+    return
     
     # Filter by status
     watching = [pair for pair in filtered if get_status(pair[1]) == "watching"]
