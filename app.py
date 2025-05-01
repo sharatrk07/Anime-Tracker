@@ -763,19 +763,17 @@ def display_add_view():
             progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
             
             st.markdown(f"""
-            <div style='margin-top:20px;'>
-                <div style='display:flex; justify-content:space-between; margin-bottom:5px;'>
-                    <span>Progress</span>
-                    <span>{progress:.1f}%</span>
+                <div style='margin-top:20px;'>
+                    <div style='display:flex; justify-content:space-between; margin-bottom:5px;'>
+                        <span>Progress</span>
+                        <span>{progress:.1f}%</span>
+                    </div>
+                    <div class='progress-container'>
+                        <div class='progress-bar' style='width:{progress}%;'></div>
+                    </div>
                 </div>
-                <div class='progress-container'>
-                    <div class='progress-bar' style='width:{progress}%;'></div>
-                </div>
-            </div>
-            """,  style='width:{progress}%;'></div>
-                </div>
-            </div>
             """, unsafe_allow_html=True)
+
         
         col_cancel, col_save = st.columns([1, 2])
         with col_cancel:
