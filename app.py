@@ -90,15 +90,10 @@ st.markdown("""
     }
     
     .anime-grid {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
         gap: 30px;
         width: 100%;
-    }
-    
-    .anime-card-wrapper {
-        flex: 0 0 calc(50% - 15px);
-        margin-bottom: 20px;
     }
     
     .anime-card {
@@ -404,8 +399,8 @@ st.markdown("""
             font-size: 1.5rem;
         }
         
-        .anime-card-wrapper {
-            flex: 0 0 100%;
+        .anime-grid {
+            grid-template-columns: 1fr;
         }
         
         .auth-container {
@@ -503,6 +498,7 @@ def load_anime_collection():
     except Exception as e:
         st.error(f"Error loading data: {e}")
         st.session_state.anime_collection = []
+
 
 def save_anime_collection():
     try:
@@ -647,6 +643,7 @@ def render_anime_card(index, anime):
         except:
             pass
     
+    # Enhanced card with improved hover effects and transitions
     card_html = f"""
     <div class="anime-card">
         <div class="anime-image" style="background-image: url('{image_url}');">
@@ -659,14 +656,18 @@ def render_anime_card(index, anime):
                 <span>Seasons: {anime['seasons']}</span>
                 <span>Episodes: {anime['finished_episodes']}/{anime['total_episodes']}</span>
             </div>
-            <div class="progress-container"><div class="progress-bar" style="width: {progress}%;"></div></div>
-            <div style="text-align:center; margin-top:8px; font-size:0.9rem; color:#B9B9C3;">{progress}% complete</div>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: {progress}%; transition: width 0.5s ease-in-out;"></div>
+            </div>
+            <div style="text-align:center; margin-top:8px; font-size:0.9rem; color:#B9B9C3;">
+                <span class="progress-text">{progress}% complete</span>
+            </div>
         </div>
     </div>
     """
     st.markdown(card_html, unsafe_allow_html=True)
     
-    # Card actions with improved layout
+    # Card actions with improved layout for better mobile experience
     st.markdown('<div class="card-actions">', unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([2, 2, 1])
@@ -700,11 +701,23 @@ def display_responsive_section(title, anime_list):
         
     st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
     
+    # Improved responsive grid container
     st.markdown('<div class="anime-grid-container">', unsafe_allow_html=True)
-    st.markdown('<div class="anime-grid">', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="anime-grid" style="
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        width: 100%;
+    ">
+    """, unsafe_allow_html=True)
     
     for i, (idx, anime) in enumerate(anime_list):
-        st.markdown('<div class="anime-card-wrapper">', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="anime-card-wrapper" style="
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        ">
+        """, unsafe_allow_html=True)
         render_anime_card(idx, anime)
         st.markdown('</div>', unsafe_allow_html=True)
     
@@ -718,15 +731,21 @@ def display_home_view():
         if st.session_state.search_query:
             st.markdown("""
             <div style="text-align:center; padding:50px 0;">
-                <h3>No anime found matching your search</h3>
-                <p>Try a different search term or clear the search</p>
+                <h3 style="color:#e0e0e6; margin-bottom:15px;">No anime found matching your search</h3>
+                <p style="color:#B9B9C3; font-size:1.1rem;">Try a different search term or clear the search</p>
             </div>
             """, unsafe_allow_html=True)
         else:
             st.markdown("""
             <div style="text-align:center; padding:50px 0;">
-                <h3>Your anime collection is empty</h3>
-                <p>Add your favorite anime by clicking the "+ Add New" button above</p>
+                <h3 style="color:#e0e0e6; margin-bottom:15px;">Your anime collection is empty</h3>
+                <p style="color:#B9B9C3; font-size:1.1rem;">Add your favorite anime by clicking the "+ Add New" button above</p>
+                <div class="pulse-animation" style="
+                    margin-top: 20px;
+                    font-size: 2rem;
+                    animation: pulse 2s infinite;
+                    color: #6C63FF;
+                ">➕</div>
             </div>
             """, unsafe_allow_html=True)
         return
@@ -745,9 +764,17 @@ def display_add_view():
         'anime_name': '', 'seasons': 1, 'total_episodes': 12, 'finished_episodes': 0, 'image': None
     }
     
-    st.markdown(f"<h2 class='section-header'>{'Edit' if is_edit else 'Add New'} Anime</h2>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <h2 class='section-header'>
+        {'Edit' if is_edit else 'Add New'} Anime
+        <span class="section-header-accent" style="font-size: 1.2rem; margin-left: 10px; opacity: 0.7;">
+            {'✏️' if is_edit else '🌟'}
+        </span>
+    </h2>
+    """, unsafe_allow_html=True)
     
     with st.form("anime_form", clear_on_submit=False):
+        # Responsive columns that stack on mobile
         col_img, col_form = st.columns([1, 2])
         
         with col_img:
@@ -769,10 +796,12 @@ def display_add_view():
                 else:
                     st.markdown("""
                     <div style='height:200px; background:#2D2D3D; display:flex; align-items:center; 
-                    justify-content:center; border-radius:10px; color:#B9B9C3;'>
+                    justify-content:center; border-radius:10px; color:#B9B9C3; 
+                    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);'>
                         <div style='text-align:center;'>
                             <div style='font-size:24px; margin-bottom:10px;'>📷</div>
                             <div>No Image</div>
+                            <div style='font-size:0.8rem; margin-top:10px; opacity:0.7;'>Upload to add cover</div>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -792,18 +821,28 @@ def display_add_view():
             
             progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
             
+            # Enhanced progress display
             st.markdown(f"""
             <div style='margin-top:20px;'>
                 <div style='display:flex; justify-content:space-between; margin-bottom:5px;'>
                     <span>Progress</span>
-                    <span>{progress:.1f}%</span>
+                    <span style="font-weight:bold; color: {'#4CAF50' if progress >= 75 else '#FFC107' if progress >= 25 else '#9E9E9E'};">
+                        {progress:.1f}%
+                    </span>
                 </div>
-                <div class='progress-container'>
-                    <div class='progress-bar' style='width:{progress}%;'></div>
+                <div class='progress-container' style="height:10px; background:#2D2D3D; border-radius:5px; overflow:hidden;">
+                    <div class='progress-bar' style='
+                        width:{progress}%; 
+                        height:100%; 
+                        background: linear-gradient(90deg, #6C63FF, #8A84FF);
+                        transition: width 0.5s ease-in-out;
+                        border-radius:5px;
+                    '></div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
         
+        # Responsive button layout
         col_cancel, col_save = st.columns([1, 2])
         with col_cancel:
             if st.form_submit_button("Cancel", use_container_width=True):
@@ -829,6 +868,7 @@ def display_add_view():
                     st.rerun()
 
 def display_header():
+    # Responsive header layout
     col1, col2, col3 = st.columns([4, 1, 1])
     
     with col1:
@@ -852,11 +892,31 @@ def display_header():
         if st.button(f"👤 {st.session_state.username}", key="user_button", use_container_width=True):
             st.session_state.user_menu_visible = not st.session_state.user_menu_visible
     
+    # Enhanced user menu with improved style
     if st.session_state.user_menu_visible:
         st.markdown("""
-        <div class="user-menu">
-            <div class="user-menu-item" onclick="document.getElementById('logout_button').click();">
-                Logout
+        <div class="user-menu" style="
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: #222233;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            min-width: 150px;
+            border: 1px solid #333344;
+            overflow: hidden;
+            animation: fadeIn 0.2s ease-out;
+        ">
+            <div class="user-menu-item" onclick="document.getElementById('logout_button').click();" style="
+                padding: 12px 15px;
+                cursor: pointer;
+                transition: background 0.2s;
+                color: #e0e0e6;
+                display: flex;
+                align-items: center;
+            ">
+                <span style="margin-right: 8px;">🚪</span> Logout
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -867,8 +927,26 @@ def display_header():
 def render_toasts():
     if st.session_state.toasts:
         for i, toast in enumerate(st.session_state.toasts):
+            # Enhanced toast notifications with animation
             st.markdown(f"""
-            <div class="toast toast-{toast['type']}" style="bottom: {20 + i*60}px">
+            <div class="toast toast-{toast['type']}" style="
+                position: fixed;
+                bottom: {20 + i*60}px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 1000;
+                min-width: 250px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideIn 0.3s ease, fadeOut 0.5s ease 2.5s forwards;
+                background: {'#4CAF50' if toast['type'] == 'success' else '#F44336' if toast['type'] == 'error' else '#2196F3'};
+                color: white;
+                display: flex;
+                align-items: center;
+            ">
+                <span style="margin-right: 10px; font-size: 1.2rem;">
+                    {'✅' if toast['type'] == 'success' else '❌' if toast['type'] == 'error' else 'ℹ️'}
+                </span>
                 {toast['message']}
             </div>
             """, unsafe_allow_html=True)
@@ -876,7 +954,18 @@ def render_toasts():
         st.session_state.toasts = []
 
 def main_page():
-    st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
+    st.markdown("""
+    <h1 class="page-title" style="
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+        color: #e0e0e6;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+    ">
+        <span style="margin-right: 10px;">📺</span> Anime Tracker
+    </h1>
+    """, unsafe_allow_html=True)
     
     display_header()
     
@@ -892,3 +981,91 @@ if not st.session_state.logged_in:
 else:
     load_anime_collection()
     main_page()
+
+# Add additional CSS for animations and better responsiveness
+st.markdown("""
+<style>
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.7; }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; visibility: hidden; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Improve responsiveness for smaller screens */
+@media (max-width: 768px) {
+    .anime-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+    }
+    
+    .section-header {
+        font-size: 1.5rem !important;
+        margin-left: 5px !important;
+    }
+    
+    .card-actions {
+        flex-direction: column;
+    }
+    
+    .card-action-btn {
+        margin-bottom: 5px;
+    }
+    
+    .toast {
+        min-width: 200px !important;
+        right: 10px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .anime-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Improve card hover effects */
+.anime-card-wrapper:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.anime-card {
+    transition: all 0.3s ease;
+}
+
+.anime-card:hover .anime-image-overlay {
+    opacity: 0.5;
+}
+
+.progress-bar {
+    transition: width 0.5s ease-in-out, background-color 0.5s ease;
+}
+
+.card-action-btn button {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.card-action-btn button:hover {
+    transform: scale(1.05);
+}
+
+/* Improve user menu animation */
+.user-menu-item:hover {
+    background: #333344;
+}
+</style>
+""", unsafe_allow_html=True)
