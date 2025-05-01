@@ -713,11 +713,10 @@ def display_responsive_section(title, anime_list):
     """, unsafe_allow_html=True)
     
     for i, (idx, anime) in enumerate(anime_list):
-        st.markdown("""
-        <div class="anime-card-wrapper" style="
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        ">
-        """, unsafe_allow_html=True)
+        st.markdown(f"""<div class="anime-card-column">""", unsafe_allow_html=True)
+        render_anime_card(idx, anime)
+        st.markdown("</div>", unsafe_allow_html=True)
+
         render_anime_card(idx, anime)
         st.markdown('</div>', unsafe_allow_html=True)
     
@@ -1067,5 +1066,36 @@ st.markdown("""
 .user-menu-item:hover {
     background: #333344;
 }
+
+.anime-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;
+}
+
+.anime-card-column {
+    flex: 0 0 calc(50% - 24px);
+    max-width: calc(50% - 24px);
+}
+
+@media (max-width: 768px) {
+    .anime-card-column {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.card-actions .stButton {
+    flex: 1;
+}
+
 </style>
 """, unsafe_allow_html=True)
