@@ -840,13 +840,13 @@ def display_header():
 def render_toasts():
     if st.session_state.toasts:
         for i, toast in enumerate(st.session_state.toasts):
-            st.markdown(f"""
-            <div class="toast toast-{toast['type']}" style="bottom: {20 + i*60}px">
-                {toast['message']}
-            </div>
-            """, unsafe_allow_html=True)
-        
+            st.markdown(f'''
+                <div class="toast toast-{toast['type']}" style="bottom: {20 + i*60}px">
+                    {toast['message']}
+                </div>
+            ''', unsafe_allow_html=True)
         st.session_state.toasts = []
+
 
 def main_page():
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
