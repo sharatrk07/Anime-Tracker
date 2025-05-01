@@ -826,13 +826,13 @@ def display_header():
             st.session_state.user_menu_visible = not st.session_state.user_menu_visible
     
     if st.session_state.user_menu_visible:
-        st.markdown("""
+        st.markdown('''
         <div class="user-menu">
             <div class="user-menu-item" onclick="document.getElementById('logout_button').click();">
                 Logout
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        ''', unsafe_allow_html=True)
         
         if st.button("Logout", key="logout_button", help="Logout from your account"):
             handle_action("logout", logout)
