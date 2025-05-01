@@ -37,7 +37,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS with enhanced styling
+# Enhanced CSS with improved hover effects and spacing
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
@@ -46,6 +46,9 @@ st.markdown("""
     --primary: #8A4FFF;
     --primary-light: #9D6FFF;
     --primary-dark: #7A3FEF;
+    --secondary: #FF4F8A;
+    --secondary-light: #FF6B9E;
+    --secondary-dark: #E63A75;
     --bg-dark: #121212;
     --bg-card: #1E1E1E;
     --bg-input: #2D2D2D;
@@ -63,29 +66,41 @@ st.markdown("""
     font-family: 'Poppins', sans-serif;
 }
 
-/* Header Styles */
+/* Enhanced Header Styles */
 .page-title {
-    font-size: 3.5rem;
+    font-size: 4rem;
     font-weight: 800;
     text-align: center;
-    margin: 30px 0;
-    background: linear-gradient(90deg, #8A4FFF, #FF4F8A);
+    margin: 40px 0;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 20px rgba(138, 79, 255, 0.3);
+    text-shadow: 0 0 30px rgba(138, 79, 255, 0.4);
     letter-spacing: -1px;
+    transform: scale(1);
+    transition: transform 0.3s ease;
+}
+
+.page-title:hover {
+    transform: scale(1.02);
 }
 
 .section-header {
-    font-size: 2rem;
-    margin-top: 50px;
-    margin-bottom: 25px;
+    font-size: 2.2rem;
+    margin-top: 60px;
+    margin-bottom: 30px;
     font-weight: 700;
     color: var(--text-light);
     position: relative;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     border-bottom: 2px solid var(--primary);
     display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.section-header:hover {
+    transform: translateY(-2px);
+    text-shadow: 0 0 10px rgba(138, 79, 255, 0.3);
 }
 
 .section-header::after {
@@ -93,84 +108,101 @@ st.markdown("""
     position: absolute;
     bottom: -2px;
     left: 0;
-    width: 60px;
+    width: 80px;
     height: 2px;
-    background-color: var(--primary);
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transition: width 0.3s ease;
+}
+
+.section-header:hover::after {
+    width: 100%;
 }
 
 .section-container {
-    margin-bottom: 40px;
-    padding-bottom: 20px;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
     border-bottom: 1px solid var(--border);
 }
 
-/* Anime Card Styles */
+/* Improved Anime Card Styles */
 .anime-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 25px;
+    gap: 35px;
 }
 
 .anime-card {
     background-color: var(--bg-card);
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
     border: 1px solid var(--border);
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     height: 100%;
+    margin-bottom: 25px;
 }
 
 .anime-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-10px);
     border-color: var(--primary);
-    box-shadow: 0 8px 16px rgba(138, 79, 255, 0.3);
+    box-shadow: 0 15px 30px rgba(138, 79, 255, 0.4);
 }
 
 .anime-image {
-    height: 220px;
+    height: 240px;
     background-size: cover;
     background-position: center;
     position: relative;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
     background-color: #000000;
 }
 
 .anime-card:hover .anime-image {
-    filter: brightness(1.1);
+    filter: brightness(1.2);
 }
 
 .anime-card-content {
-    padding: 20px;
+    padding: 25px;
 }
 
 .anime-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin-bottom: 12px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 15px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: color 0.3s ease;
+}
+
+.anime-card:hover .anime-title {
+    color: var(--primary-light);
 }
 
 .anime-stats {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
-    margin-top: 12px;
+    font-size: 1rem;
+    margin-top: 15px;
     color: var(--text-muted);
 }
 
 .status-badge {
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 999px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     text-transform: uppercase;
     font-weight: 600;
     position: absolute;
-    top: 10px;
-    right: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    top: 15px;
+    right: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.anime-card:hover .status-badge {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
 .status-watching {
@@ -192,87 +224,301 @@ st.markdown("""
     background-color: var(--bg-input);
     border-radius: 999px;
     overflow: hidden;
-    margin-top: 12px;
-    height: 8px;
+    margin-top: 15px;
+    height: 10px;
 }
 
 .progress-bar {
-    height: 8px;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    transition: width 0.5s ease;
+    height: 10px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transition: width 0.8s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-/* Form Styles */
+/* Enhanced Button Styles */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.action-button {
+    background-color: var(--bg-input);
+    color: var(--text-light);
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.edit-button {
+    background-color: var(--primary-dark);
+}
+
+.edit-button:hover {
+    background-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(138, 79, 255, 0.3);
+}
+
+.delete-button {
+    background-color: var(--secondary-dark);
+}
+
+.delete-button:hover {
+    background-color: var(--secondary);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(255, 79, 138, 0.3);
+}
+
+/* Enhanced Form Styles */
 .stTextInput > div > div > input, 
 .stNumberInput > div > div > input {
     background-color: var(--bg-input);
     border: 1px solid var(--border);
     color: var(--text-light);
-    border-radius: 8px;
-    padding: 10px 15px;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
 }
 
 .stTextInput > div > div > input:focus, 
 .stNumberInput > div > div > input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 1px var(--primary);
+    box-shadow: 0 0 0 2px rgba(138, 79, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 .stButton > button {
-    border-radius: 8px;
+    border-radius: 12px;
     font-weight: 600;
     transition: all 0.3s ease;
-    padding: 10px 20px;
+    padding: 12px 24px;
+    font-size: 1.05rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .stButton > button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Auth Styles */
+/* Enhanced Auth Styles */
 .auth-container {
-    max-width: 500px;
-    margin: 40px auto;
-    padding: 30px;
+    max-width: 550px;
+    margin: 50px auto;
+    padding: 40px;
     background-color: var(--bg-card);
-    border-radius: 16px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 24px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
 }
 
-/* Search Bar */
+.auth-container:hover {
+    box-shadow: 0 20px 40px rgba(138, 79, 255, 0.2);
+    border-color: var(--primary-light);
+}
+
+.auth-tab {
+    background-color: var(--bg-input);
+    color: var(--text-light);
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.auth-tab.active {
+    background-color: var(--primary);
+}
+
+.auth-tab:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced Search Bar */
 .search-container {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .search-input {
     width: 100%;
-    padding: 12px 20px;
-    padding-right: 40px;
+    padding: 14px 24px;
+    padding-right: 50px;
     background-color: var(--bg-input);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 12px;
+    color: var(--text-light);
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 6px 12px rgba(138, 79, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Enhanced User Menu */
+.user-menu {
+    position: absolute;
+    right: 25px;
+    top: 70px;
+    background-color: var(--bg-card);
+    border-radius: 16px;
+    padding: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+    transform-origin: top right;
+    animation: menuAppear 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes menuAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.user-menu-button {
+    background-color: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    border-radius: 12px;
+    padding: 10px;
+    width: 100%;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.user-menu-button:hover {
+    background-color: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Enhanced Add Button */
+.add-button {
+    background: linear-gradient(45deg, var(--primary), var(--primary-light));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 6px rgba(138, 79, 255, 0.3);
+}
+
+.add-button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 15px rgba(138, 79, 255, 0.4);
+    background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+}
+
+.add-button-icon {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.add-button:hover .add-button-icon {
+    transform: rotate(90deg);
+}
+
+/* Enhanced Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 30px;
+    background-color: var(--bg-card);
+    border-radius: 24px;
+    margin: 50px 0;
+    border: 1px dashed var(--border);
+    transition: all 0.3s ease;
+}
+
+.empty-state:hover {
+    border-color: var(--primary);
+    box-shadow: 0 10px 20px rgba(138, 79, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+.empty-state-image {
+    max-width: 220px;
+    margin-bottom: 25px;
+    transition: transform 0.5s ease;
+}
+
+.empty-state:hover .empty-state-image {
+    transform: scale(1.1);
+}
+
+.empty-state-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 15px;
     color: var(--text-light);
 }
 
-/* User Menu */
-.user-menu {
-    position: absolute;
-    right: 20px;
-    top: 60px;
-    background-color: var(--bg-card);
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    border: 1px solid var(--border);
+.empty-state-text {
+    color: var(--text-muted);
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+}
+
+/* Enhanced Category Labels */
+.category-label {
+    display: inline-block;
+    padding: 6px 14px;
+    background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+    color: white;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 6px rgba(138, 79, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.category-label:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(138, 79, 255, 0.4);
 }
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .page-title {
-        font-size: 2.8rem;
+        font-size: 3rem;
     }
     
     .section-header {
@@ -280,56 +526,83 @@ st.markdown("""
     }
     
     .anime-image {
+        height: 200px;
+    }
+    
+    .anime-title {
+        font-size: 1.4rem;
+    }
+    
+    .anime-card-content {
+        padding: 20px;
+    }
+    
+    .auth-container {
+        padding: 30px;
+        margin: 30px auto;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-title {
+        font-size: 2.5rem;
+    }
+    
+    .section-header {
+        font-size: 1.6rem;
+    }
+    
+    .anime-image {
         height: 180px;
     }
     
     .anime-title {
-        font-size: 1.2rem;
-    }
-    
-    .anime-card-content {
-        padding: 15px;
+        font-size: 1.3rem;
     }
 }
 
-/* Button Styles */
-.primary-btn {
-    background-color: var(--primary);
-    color: white;
-}
-
-.primary-btn:hover {
-    background-color: var(--primary-dark);
-}
-
-.secondary-btn {
-    background-color: transparent;
-    border: 1px solid var(--primary);
-    color: var(--primary);
-}
-
-.secondary-btn:hover {
-    background-color: rgba(138, 79, 255, 0.1);
-}
-
-/* Image placeholder */
+/* Image placeholder with animation */
 .image-placeholder {
-    height: 220px;
+    height: 240px;
     background-color: #000000;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--text-muted);
     font-size: 1.2rem;
-    border-radius: 8px 8px 0 0;
+    border-radius: 20px 20px 0 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-placeholder::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    to {
+        left: 100%;
+    }
 }
 
 /* Loading animation */
 .loading {
     display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255,255,255,.3);
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(138, 79, 255, 0.3);
     border-radius: 50%;
     border-top-color: var(--primary);
     animation: spin 1s ease-in-out infinite;
@@ -348,10 +621,14 @@ footer {visibility: hidden;}
 .stFileUploader > div > button {
     background-color: var(--primary);
     color: white;
+    border-radius: 12px;
+    transition: all 0.3s ease;
 }
 
 .stFileUploader > div > button:hover {
     background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(138, 79, 255, 0.3);
 }
 
 /* Custom slider */
@@ -361,7 +638,7 @@ footer {visibility: hidden;}
 
 /* Custom progress bar */
 .stProgress > div > div > div > div {
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
 }
 </style>
 """, unsafe_allow_html=True)
@@ -452,7 +729,6 @@ def save_anime_collection():
         for anime in st.session_state.anime_collection:
             anime_copy = anime.copy()
             if isinstance(anime_copy.get('image'), bytes):
-                # Compress image before saving to ensure it's not too large
                 try:
                     compressed_image = compress_image(anime_copy['image'])
                     if compressed_image:
@@ -497,34 +773,38 @@ def set_view(view_name, **kwargs):
         if key in st.session_state:
             st.session_state[key] = value
 
-# Authentication page
+# Enhanced Authentication page
 def auth_page():
     st.markdown('<div class="auth-container">', unsafe_allow_html=True)
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
     
     # Anime image for decoration
     st.markdown("""
-    <div style="text-align: center; margin-bottom: 30px;">
-        <img src="https://i.imgur.com/XJyemeI.png" alt="Anime" style="max-width: 200px; border-radius: 10px;">
+    <div style="text-align: center; margin-bottom: 35px; transition: all 0.5s ease;">
+        <img src="https://i.imgur.com/XJyemeI.png" alt="Anime" style="max-width: 220px; border-radius: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); transform: rotate(-3deg);">
     </div>
     """, unsafe_allow_html=True)
     
-    # Tabs for login/signup
+    # Tabs for login/signup with enhanced styling
     col1, col2 = st.columns(2)
     
-    if col1.button("Login", key="login_tab_btn", use_container_width=True, 
-                  help="Login with your existing account"):
-        st.session_state.auth_mode = "login"
+    with col1:
+        login_btn_style = "auth-tab active" if st.session_state.auth_mode == "login" else "auth-tab"
+        if st.button("Login", key="login_tab_btn", use_container_width=True, 
+                    help="Login with your existing account"):
+            st.session_state.auth_mode = "login"
     
-    if col2.button("Sign Up", key="signup_tab_btn", use_container_width=True,
-                  help="Create a new account"):
-        st.session_state.auth_mode = "signup"
+    with col2:
+        signup_btn_style = "auth-tab active" if st.session_state.auth_mode == "signup" else "auth-tab"
+        if st.button("Sign Up", key="signup_tab_btn", use_container_width=True,
+                    help="Create a new account"):
+            st.session_state.auth_mode = "signup"
     
-    st.markdown('<div style="margin: 20px 0; border-bottom: 1px solid #333;"></div>', unsafe_allow_html=True)
+    st.markdown('<div style="margin: 25px 0; border-bottom: 1px solid #333;"></div>', unsafe_allow_html=True)
     
-    # Login form
+    # Login form with enhanced styling
     if st.session_state.auth_mode == "login":
-        st.markdown('<h3 style="text-align: center; margin-bottom: 20px;">Welcome Back!</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem; background: linear-gradient(90deg, #8A4FFF, #FF4F8A); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Welcome Back!</h3>', unsafe_allow_html=True)
         login_username = st.text_input("Username", key="login_username", 
                                      placeholder="Enter your username")
         login_password = st.text_input("Password", type="password", key="login_password",
@@ -535,7 +815,6 @@ def auth_page():
         if login_btn:
             if login_username and login_password:
                 with st.spinner("Logging in..."):
-                    # Add a small delay to simulate authentication
                     time.sleep(0.5)
                     st.session_state.logged_in = True
                     st.session_state.username = login_username
@@ -544,9 +823,9 @@ def auth_page():
             else:
                 st.error("Please enter both username and password")
     
-    # Signup form
+    # Signup form with enhanced styling
     elif st.session_state.auth_mode == "signup":
-        st.markdown('<h3 style="text-align: center; margin-bottom: 20px;">Create Your Account</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem; background: linear-gradient(90deg, #8A4FFF, #FF4F8A); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Create Your Account</h3>', unsafe_allow_html=True)
         signup_username = st.text_input("Username", key="signup_username", 
                                       placeholder="Choose a username")
         signup_password = st.text_input("Password", type="password", key="signup_password",
@@ -565,7 +844,6 @@ def auth_page():
                 st.error("Passwords do not match")
             else:
                 with st.spinner("Creating your account..."):
-                    # Add a small delay to simulate account creation
                     time.sleep(0.5)
                     st.session_state.logged_in = True
                     st.session_state.username = signup_username
@@ -575,7 +853,7 @@ def auth_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Render anime card
+# Enhanced anime card rendering
 def render_anime_card(index, anime):
     progress = calculate_progress(anime)
     status = get_status(anime)
@@ -609,7 +887,7 @@ def render_anime_card(index, anime):
             <div class="progress-container">
                 <div class="progress-bar" style="width: {progress}%;"></div>
             </div>
-            <div style="text-align:center; margin-top:8px; font-size: 0.9rem; color: #AAAAAA;">
+            <div style="text-align:center; margin-top:12px; font-size: 1rem; color: #AAAAAA;">
                 {progress}% complete
             </div>
         </div>
@@ -617,26 +895,36 @@ def render_anime_card(index, anime):
     """
     st.markdown(card_html, unsafe_allow_html=True)
     
-    # Action buttons
+    # Enhanced action buttons with icons and better spacing
     col1, col2 = st.columns(2)
     with col1:
         st.button("✏️ Edit", key=f"edit_{index}", 
                 on_click=lambda: handle_action(f"edit_{index}", set_view, 'add', edit_index=index), 
-                use_container_width=True)
+                use_container_width=True,
+                help="Edit this anime entry")
     with col2:
         st.button("🗑️ Delete", key=f"delete_{index}", 
                 on_click=lambda: handle_action(f"delete_{index}", delete_anime, index), 
-                use_container_width=True)
+                use_container_width=True,
+                help="Delete this anime from your collection")
 
-# Display anime sections
+# Display anime sections with enhanced styling
 def display_section(title, anime_list):
     if not anime_list:
         return
     
     st.markdown(f'<div class="section-container">', unsafe_allow_html=True)
-    st.markdown(f'<h2 class="section-header">{title}</h2>', unsafe_allow_html=True)
     
-    # Create a responsive grid layout with 2 columns
+    # Enhanced section header with category styling
+    category_icon = {
+        "Currently Watching": "📺",
+        "Planned to Watch": "📝",
+        "Completed": "✅"
+    }.get(title, "")
+    
+    st.markdown(f'<h2 class="section-header">{category_icon} {title}</h2>', unsafe_allow_html=True)
+    
+    # Create a responsive grid layout with better spacing
     cols = st.columns(2)
     for i, (idx, anime) in enumerate(anime_list):
         with cols[i % 2]:
@@ -644,16 +932,16 @@ def display_section(title, anime_list):
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Home view
+# Enhanced home view
 def display_home_view():
     filtered = filter_anime_collection()
     
     if not filtered:
         st.markdown("""
-        <div style="text-align: center; padding: 50px 20px; background-color: #1E1E1E; border-radius: 16px; margin: 40px 0;">
-            <img src="https://i.imgur.com/XJyemeI.png" alt="Empty collection" style="max-width: 200px; margin-bottom: 20px;">
-            <h3>Your anime collection is empty</h3>
-            <p style="color: #AAAAAA; margin-bottom: 20px;">Start tracking your favorite anime by adding them to your collection.</p>
+        <div class="empty-state">
+            <img src="https://i.imgur.com/XJyemeI.png" alt="Empty collection" class="empty-state-image">
+            <h3 class="empty-state-title">Your anime collection is empty</h3>
+            <p class="empty-state-text">Start tracking your favorite anime by adding them to your collection.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -666,12 +954,12 @@ def display_home_view():
     planned = [pair for pair in filtered if get_status(pair[1]) == "planned"]
     completed = [pair for pair in filtered if get_status(pair[1]) == "completed"]
     
-    # Display sections with spacing between them
+    # Display sections with enhanced spacing
     display_section("Currently Watching", watching)
     display_section("Planned to Watch", planned)
     display_section("Completed", completed)
 
-# Add/Edit anime view
+# Enhanced Add/Edit anime view
 def display_add_view():
     is_edit = st.session_state.edit_index is not None
     anime_data = st.session_state.anime_collection[st.session_state.edit_index] if is_edit else {
@@ -682,13 +970,13 @@ def display_add_view():
         'image': None
     }
     
-    st.markdown(f'<h2 class="section-header">{"Edit" if is_edit else "Add New"} Anime</h2>', unsafe_allow_html=True)
+    st.markdown(f'<h2 class="section-header">{"✏️ Edit" if is_edit else "➕ Add New"} Anime</h2>', unsafe_allow_html=True)
     
     with st.form("anime_form", clear_on_submit=False):
         col_img, col_form = st.columns([1, 2])
         
         with col_img:
-            st.markdown('<p style="margin-bottom: 10px;">Cover Image</p>', unsafe_allow_html=True)
+            st.markdown('<p style="margin-bottom: 15px; font-size: 1.1rem; font-weight: 500;">Cover Image</p>', unsafe_allow_html=True)
             
             image_file = st.file_uploader("", type=["png", "jpg", "jpeg"], label_visibility="collapsed")
             
@@ -712,7 +1000,7 @@ def display_add_view():
                 else:
                     st.markdown("""
                     <div class="image-placeholder">
-                        <div>No Image Selected</div>
+                        <div>📷 No Image Selected</div>
                     </div>
                     """, unsafe_allow_html=True)
         
@@ -730,20 +1018,20 @@ def display_add_view():
             
             progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
             st.markdown(f"""
-            <div style="margin-top:16px; display: flex; justify-content: space-between; align-items: center;">
-                <span>Progress:</span>
-                <span style="font-weight: 600; color: #8A4FFF;">{progress:.1f}%</span>
+            <div style="margin-top:20px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 1.1rem;">Progress:</span>
+                <span style="font-weight: 600; color: #8A4FFF; font-size: 1.1rem;">{progress:.1f}%</span>
             </div>
             """, unsafe_allow_html=True)
             
             st.progress(progress/100.0)
         
-        # Form buttons
+        # Enhanced form buttons
         col_save, col_cancel = st.columns(2)
         with col_save:
-            save_btn = st.form_submit_button("Save Anime", use_container_width=True)
+            save_btn = st.form_submit_button("💾 Save Anime", use_container_width=True)
         with col_cancel:
-            cancel_btn = st.form_submit_button("Cancel", use_container_width=True)
+            cancel_btn = st.form_submit_button("❌ Cancel", use_container_width=True)
         
         if save_btn:
             if not anime_name:
@@ -765,12 +1053,12 @@ def display_add_view():
             st.session_state.edit_index = None
             st.rerun()
 
-# Header with search and user menu
+# Enhanced header with search and user menu
 def display_header():
     col1, col2, col3 = st.columns([6, 1, 1])
     
     with col1:
-        # Enhanced search input without the clear button
+        # Enhanced search input with icon
         search = st.text_input("", value=st.session_state.search_query, 
                              placeholder="🔍 Search your anime collection...", 
                              key="search_input", 
@@ -781,34 +1069,34 @@ def display_header():
         st.session_state.search_query = search
     
     with col2:
-        # Add new anime button
+        # Enhanced add new anime button
         if st.button("➕ Add", key="add_button", use_container_width=True,
                    help="Add a new anime to your collection"):
             handle_action("add_new", set_view, 'add', edit_index=None)
     
     with col3:
-        # User menu button
+        # Enhanced user menu button
         if st.button(f"👤", key="user_button", use_container_width=True,
                    help=f"Logged in as {st.session_state.username}"):
             st.session_state.user_menu_visible = not st.session_state.user_menu_visible
     
-    # User menu dropdown
+    # Enhanced user menu dropdown
     if st.session_state.user_menu_visible:
-        st.markdown("""
+        st.markdown(f"""
         <div class="user-menu">
-            <div style="padding: 10px; text-align: center; border-bottom: 1px solid #333; margin-bottom: 10px;">
-                <span style="font-weight: 600;">👤 {}</span>
+            <div style="padding: 12px; text-align: center; border-bottom: 1px solid #333; margin-bottom: 12px;">
+                <span style="font-weight: 600; font-size: 1.1rem;">👤 {st.session_state.username}</span>
             </div>
             <div style="padding: 5px 10px;">
-                <button class="stButton secondary-btn" style="width: 100%;">Logout</button>
+                <button class="user-menu-button">🚪 Logout</button>
             </div>
         </div>
-        """.format(st.session_state.username), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
         
         if st.button("Logout", key="logout_button", use_container_width=True):
             handle_action("logout", logout)
 
-# Main page with header and content
+# Enhanced main page with header and content
 def main_page():
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
     display_header()
