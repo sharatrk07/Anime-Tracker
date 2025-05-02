@@ -121,7 +121,7 @@ st.markdown("""
     width: 100%;
 }
 
-/* Enhanced category line styling */
+/* Enhanced category line styling with animation */
 .category-line {
     display: block;
     width: 100%;
@@ -131,11 +131,35 @@ st.markdown("""
     border-radius: 3px;
     box-shadow: 0 2px 10px rgba(138, 79, 255, 0.2);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .category-line:hover {
     height: 5px;
     box-shadow: 0 4px 15px rgba(138, 79, 255, 0.4);
+}
+
+.category-line::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    to {
+        left: 100%;
+    }
 }
 
 .section-container {
@@ -182,13 +206,13 @@ st.markdown("""
 }
 
 .anime-card-content {
-    padding: 25px;
+    padding: 30px; /* Increased padding */
 }
 
 .anime-title {
     font-size: 1.6rem;
     font-weight: 700;
-    margin-bottom: 20px; /* Increased spacing */
+    margin-bottom: 25px; /* Increased spacing */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -203,8 +227,8 @@ st.markdown("""
     display: flex;
     justify-content: space-between;
     font-size: 1rem;
-    margin-top: 20px; /* Increased spacing */
-    margin-bottom: 20px; /* Increased spacing */
+    margin-top: 25px; /* Increased spacing */
+    margin-bottom: 25px; /* Increased spacing */
     color: var(--text-muted);
 }
 
@@ -245,8 +269,8 @@ st.markdown("""
     background-color: var(--bg-input);
     border-radius: 999px;
     overflow: hidden;
-    margin-top: 20px; /* Increased spacing */
-    margin-bottom: 15px; /* Increased spacing */
+    margin-top: 25px; /* Increased spacing */
+    margin-bottom: 20px; /* Increased spacing */
     height: 10px;
 }
 
@@ -256,31 +280,14 @@ st.markdown("""
     transition: width 0.8s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-/* Enhanced Button Styles with new hover effects */
+/* Enhanced Button Styles with new hover effects - NO RED */
 .action-buttons {
     display: flex;
     gap: 15px;
-    margin-top: 25px; /* Increased spacing */
+    margin-top: 30px; /* Increased spacing */
 }
 
-.action-button {
-    background-color: var(--bg-input);
-    color: var(--text-light);
-    border: none;
-    border-radius: 12px;
-    padding: 10px 20px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* New button hover styles */
+/* New button hover styles - completely removed red */
 .stButton > button {
     border-radius: 12px;
     font-weight: 600;
@@ -288,6 +295,8 @@ st.markdown("""
     padding: 12px 24px;
     font-size: 1.05rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--bg-input);
+    color: var(--text-light);
 }
 
 .stButton > button:hover {
@@ -319,6 +328,31 @@ div[data-testid="stHorizontalBlock"] > div:nth-child(2) .stButton > button:hover
     background-color: var(--secondary);
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(79, 157, 255, 0.3);
+}
+
+/* Login/Signup buttons */
+div[data-testid="stHorizontalBlock"] .stButton > button {
+    background-color: var(--bg-input);
+    color: var(--text-light);
+}
+
+div[data-testid="stHorizontalBlock"] .stButton > button:hover {
+    background-color: var(--primary);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(138, 79, 255, 0.3);
+}
+
+/* Form submit buttons */
+form .stButton > button {
+    background-color: var(--primary-dark);
+    color: white;
+}
+
+form .stButton > button:hover {
+    background-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(138, 79, 255, 0.3);
 }
 
 /* Enhanced Form Styles */
@@ -554,7 +588,7 @@ div[data-testid="stHorizontalBlock"] > div:nth-child(2) .stButton > button:hover
     }
     
     .anime-card-content {
-        padding: 20px;
+        padding: 25px;
     }
     
     .auth-container {
@@ -902,7 +936,7 @@ def render_anime_card(index, anime):
             <div class="progress-container">
                 <div class="progress-bar" style="width: {progress}%;"></div>
             </div>
-            <div style="text-align:center; margin-top:15px; margin-bottom:15px; font-size: 1rem; color: #AAAAAA;">
+            <div style="text-align:center; margin-top:20px; margin-bottom:20px; font-size: 1rem; color: #AAAAAA;">
                 {progress}% complete
             </div>
         </div>
@@ -939,7 +973,7 @@ def display_section(title, anime_list):
     
     st.markdown(f'<h2 class="section-header">{category_icon} {title}</h2>', unsafe_allow_html=True)
     
-    # Add category line effect
+    # Add category line effect with animation
     st.markdown(f'<div class="category-line"></div>', unsafe_allow_html=True)
     
     # Create a responsive grid layout with better spacing
@@ -1036,7 +1070,7 @@ def display_add_view():
             
             progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
             st.markdown(f"""
-            <div style="margin-top:20px; margin-bottom:10px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="margin-top:25px; margin-bottom:15px; display: flex; justify-content: space-between; align-items: center;">
                 <span style="font-size: 1.1rem;">Progress:</span>
                 <span style="font-weight: 600; color: #8A4FFF; font-size: 1.1rem;">{progress:.1f}%</span>
             </div>
