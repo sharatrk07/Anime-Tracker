@@ -832,8 +832,6 @@ def auth_page():
     st.markdown('<div class="auth-container">', unsafe_allow_html=True)
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
     
-    # Removed image as requested
-    
     # Tabs for login/signup with enhanced styling
     col1, col2 = st.columns(2)
     
