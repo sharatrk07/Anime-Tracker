@@ -778,24 +778,29 @@ def load_anime_collection():
             st.session_state.anime_collection = []
 
 def save_anime_collection():
-    if st.session_state.username:
-        anime_collection_serializable = []
-        for anime in st.session_state.anime_collection:
-            anime_copy = anime.copy()
-            if isinstance(anime_copy.get('image'), bytes):
-                try:
-                    compressed_image = compress_image(anime_copy['image'])
-                    if compressed_image:
-                        anime_copy['image'] = base64.b64encode(compressed_image).decode('utf-8')
-                    else:
-                        anime_copy['image'] = ""
-                except:
-                    anime_copy['image'] = ""
-            elif anime_copy.get('image') is None:
-                anime_copy['image'] = ""
-            anime_collection_serializable.append(anime_copy)
-        doc_ref = db.collection("users").document(st.session_state.username)
-        doc_ref.set({"anime_collection": anime_collection_serializable})
+    if not st.session_state.username:
+        return
+
+    serializable = []
+    for anime in st.session_state.anime_collection:
+        copy = anime.copy()
+        img = copy.get("image")
+
+        if isinstance(img, (bytes, bytearray)):
+            try:
+                comp = compress_image(img)
+                copy["image"] = base64.b64encode(comp).decode("utf-8") if comp else ""
+            except Exception:
+                copy["image"] = ""
+        else:
+            copy["image"] = img or ""
+
+        serializable.append(copy)
+
+    db.collection("users")\
+      .document(st.session_state.username)\
+      .set({"anime_collection": serializable})
+
 
 def save_anime_data(anime_data, edit_index=None):
     if edit_index is not None:
