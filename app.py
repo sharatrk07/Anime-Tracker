@@ -777,29 +777,35 @@ def load_anime_collection():
         else:
             st.session_state.anime_collection = []
 
+import datetime
+
 def save_anime_collection():
     if not st.session_state.username:
         return
 
     serializable = []
     for anime in st.session_state.anime_collection:
-        copy = anime.copy()
-        img = copy.get("image")
+        clean = {}
+        for k, v in anime.items():
+            # bytes → base64
+            if isinstance(v, (bytes, bytearray)):
+                try:
+                    comp = compress_image(v)
+                    clean[k] = base64.b64encode(comp).decode('utf-8') if comp else ""
+                except:
+                    clean[k] = ""
+            # datetime → iso string
+            elif isinstance(v, datetime.datetime):
+                clean[k] = v.isoformat()
+            # None → empty string, everything else passthrough
+            else:
+                clean[k] = v or ""
+        serializable.append(clean)
 
-        if isinstance(img, (bytes, bytearray)):
-            try:
-                comp = compress_image(img)
-                copy["image"] = base64.b64encode(comp).decode("utf-8") if comp else ""
-            except Exception:
-                copy["image"] = ""
-        else:
-            copy["image"] = img or ""
-
-        serializable.append(copy)
-
-    db.collection("users")\
-      .document(st.session_state.username)\
+    db.collection("users") \
+      .document(st.session_state.username) \
       .set({"anime_collection": serializable})
+
 
 
 def save_anime_data(anime_data, edit_index=None):
