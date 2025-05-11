@@ -694,6 +694,106 @@ footer {visibility: hidden;}
 .stProgress > div > div > div > div {
     background: linear-gradient(90deg, var(--primary), var(--secondary));
 }
+
+/* Toast notification */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--bg-card);
+    color: var(--text-light);
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+    border-left: 4px solid var(--primary);
+}
+
+.toast-success {
+    border-left-color: var(--status-completed);
+}
+
+.toast-error {
+    border-left-color: var(--status-planned);
+}
+
+.toast-info {
+    border-left-color: var(--status-watching);
+}
+
+@keyframes toastIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes toastOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Image upload preview */
+.image-preview {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.image-preview:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Upload button enhancement */
+.upload-container {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.upload-container:hover {
+    border-color: var(--primary);
+    background-color: rgba(138, 79, 255, 0.05);
+}
+
+.upload-icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.upload-text {
+    color: var(--text-muted);
+    font-size: 1rem;
+    text-align: center;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -742,74 +842,156 @@ def handle_action(action_name, callback_func, *args, **kwargs):
 def filter_anime_collection():
     filtered = []
     for idx, anime in enumerate(st.session_state.anime_collection):
-        if not st.session_state.search_query or st.session_state.search_query.lower() in anime['anime_name'].lower():
+        if not st.session_state.search_query or st.session_state.search_query.lower() in anime.get('anime_name', '').lower():
             filtered.append((idx, anime))
     return filtered
 
 def get_status(anime):
-    if anime['finished_episodes'] == 0:
+    # Fix for the TypeError - Add proper error handling for missing keys
+    try:
+        finished_episodes = int(anime.get('finished_episodes', 0))
+        total_episodes = int(anime.get('total_episodes', 0))
+        
+        if finished_episodes == 0:
+            return "planned"
+        elif total_episodes > 0 and finished_episodes >= total_episodes:
+            return "completed"
+        else:
+            return "watching"
+    except (TypeError, ValueError):
+        # If there's any error in conversion or missing keys, default to planned
         return "planned"
-    elif anime['finished_episodes'] >= anime['total_episodes']:
-        return "completed"
-    else:
-        return "watching"
 
 def calculate_progress(anime):
-    if anime['total_episodes'] == 0:
+    try:
+        finished_episodes = int(anime.get('finished_episodes', 0))
+        total_episodes = int(anime.get('total_episodes', 1))  # Default to 1 to avoid division by zero
+        
+        if total_episodes == 0:
+            return 0
+        return int((finished_episodes / total_episodes) * 100)
+    except (TypeError, ValueError):
         return 0
-    return int((anime['finished_episodes'] / anime['total_episodes']) * 100)
 
 def load_anime_collection():
     if st.session_state.username:
-        doc_ref = db.collection("users").document(st.session_state.username)
-        doc = doc_ref.get()
-        if hasattr(doc, 'exists') and doc.exists:
-            anime_collection = doc.to_dict().get("anime_collection", [])
-            for anime in anime_collection:
-                if isinstance(anime.get('image'), str) and anime['image']:
-                    try:
-                        anime['image'] = base64.b64decode(anime['image'])
-                    except:
+        try:
+            doc_ref = db.collection("users").document(st.session_state.username)
+            doc = doc_ref.get()
+            if hasattr(doc, 'exists') and doc.exists:
+                anime_collection = doc.to_dict().get("anime_collection", [])
+                for anime in anime_collection:
+                    # Ensure all required fields exist
+                    if not isinstance(anime, dict):
+                        continue
+                        
+                    # Set default values for missing fields
+                    if 'anime_name' not in anime:
+                        anime['anime_name'] = 'Untitled Anime'
+                    if 'seasons' not in anime:
+                        anime['seasons'] = 1
+                    if 'total_episodes' not in anime:
+                        anime['total_episodes'] = 12
+                    if 'finished_episodes' not in anime:
+                        anime['finished_episodes'] = 0
+                    
+                    # Handle image data
+                    if isinstance(anime.get('image'), str) and anime['image']:
+                        try:
+                            anime['image'] = base64.b64decode(anime['image'])
+                        except:
+                            anime['image'] = None
+                    else:
                         anime['image'] = None
-                else:
-                    anime['image'] = None
-            st.session_state.anime_collection = anime_collection
-        else:
+                
+                st.session_state.anime_collection = anime_collection
+            else:
+                st.session_state.anime_collection = []
+        except Exception as e:
+            st.error(f"Error loading anime collection: {e}")
             st.session_state.anime_collection = []
 
 def save_anime_collection():
     if st.session_state.username:
-        anime_collection_serializable = []
-        for anime in st.session_state.anime_collection:
-            anime_copy = anime.copy()
-            if isinstance(anime_copy.get('image'), bytes):
-                try:
-                    compressed_image = compress_image(anime_copy['image'])
-                    if compressed_image:
-                        anime_copy['image'] = base64.b64encode(compressed_image).decode('utf-8')
-                    else:
+        try:
+            anime_collection_serializable = []
+            for anime in st.session_state.anime_collection:
+                if not isinstance(anime, dict):
+                    continue
+                    
+                anime_copy = anime.copy()
+                
+                # Ensure all required fields exist
+                if 'anime_name' not in anime_copy:
+                    anime_copy['anime_name'] = 'Untitled Anime'
+                if 'seasons' not in anime_copy:
+                    anime_copy['seasons'] = 1
+                if 'total_episodes' not in anime_copy:
+                    anime_copy['total_episodes'] = 12
+                if 'finished_episodes' not in anime_copy:
+                    anime_copy['finished_episodes'] = 0
+                
+                # Handle image data
+                if isinstance(anime_copy.get('image'), bytes):
+                    try:
+                        compressed_image = compress_image(anime_copy['image'])
+                        if compressed_image:
+                            anime_copy['image'] = base64.b64encode(compressed_image).decode('utf-8')
+                        else:
+                            anime_copy['image'] = ""
+                    except:
                         anime_copy['image'] = ""
-                except:
+                elif anime_copy.get('image') is None:
                     anime_copy['image'] = ""
-            elif anime_copy.get('image') is None:
-                anime_copy['image'] = ""
-            anime_collection_serializable.append(anime_copy)
-        doc_ref = db.collection("users").document(st.session_state.username)
-        doc_ref.set({"anime_collection": anime_collection_serializable})
+                
+                anime_collection_serializable.append(anime_copy)
+            
+            doc_ref = db.collection("users").document(st.session_state.username)
+            doc_ref.set({"anime_collection": anime_collection_serializable})
+            return True
+        except Exception as e:
+            st.error(f"Error saving anime collection: {e}")
+            return False
 
 def save_anime_data(anime_data, edit_index=None):
-    if edit_index is not None:
-        st.session_state.anime_collection[edit_index] = anime_data
-    else:
-        st.session_state.anime_collection.append(anime_data)
-    save_anime_collection()
-    st.session_state.view = 'home'
-    st.session_state.edit_index = None
+    try:
+        # Validate data
+        if not anime_data.get('anime_name'):
+            st.error("Anime name is required")
+            return False
+            
+        # Ensure numeric fields are integers
+        anime_data['seasons'] = int(anime_data.get('seasons', 1))
+        anime_data['total_episodes'] = int(anime_data.get('total_episodes', 12))
+        anime_data['finished_episodes'] = int(anime_data.get('finished_episodes', 0))
+        
+        # Update or add the anime
+        if edit_index is not None and 0 <= edit_index < len(st.session_state.anime_collection):
+            st.session_state.anime_collection[edit_index] = anime_data
+        else:
+            st.session_state.anime_collection.append(anime_data)
+        
+        # Save to database
+        if save_anime_collection():
+            st.session_state.view = 'home'
+            st.session_state.edit_index = None
+            return True
+        return False
+    except Exception as e:
+        st.error(f"Error saving anime data: {e}")
+        return False
 
 def delete_anime(index):
-    st.session_state.anime_collection.pop(index)
-    save_anime_collection()
-    st.session_state.view = 'home'
+    try:
+        if 0 <= index < len(st.session_state.anime_collection):
+            st.session_state.anime_collection.pop(index)
+            save_anime_collection()
+            st.session_state.view = 'home'
+            return True
+        return False
+    except Exception as e:
+        st.error(f"Error deleting anime: {e}")
+        return False
 
 def logout():
     st.session_state.logged_in = False
@@ -926,10 +1108,10 @@ def render_anime_card(index, anime):
             <div class="status-badge status-{status}">{status_text}</div>
         </div>
         <div class="anime-card-content">
-            <h3 class="anime-title">{anime['anime_name']}</h3>
+            <h3 class="anime-title">{anime.get('anime_name', 'Untitled Anime')}</h3>
             <div class="anime-stats">
-                <span>Seasons: {anime['seasons']}</span>
-                <span>Episodes: {anime['finished_episodes']}/{anime['total_episodes']}</span>
+                <span>Seasons: {anime.get('seasons', 1)}</span>
+                <span>Episodes: {anime.get('finished_episodes', 0)}/{anime.get('total_episodes', 0)}</span>
             </div>
             <div class="progress-container">
                 <div class="progress-bar" style="width: {progress}%;"></div>
@@ -1008,16 +1190,24 @@ def display_home_view():
     display_section("Planned to Watch", planned)
     display_section("Completed", completed)
 
-# Enhanced Add/Edit anime view
+# Enhanced Add/Edit anime view with improved image handling
 def display_add_view():
     is_edit = st.session_state.edit_index is not None
-    anime_data = st.session_state.anime_collection[st.session_state.edit_index] if is_edit else {
+    
+    # Initialize default anime data
+    default_anime = {
         'anime_name': '', 
         'seasons': 1, 
         'total_episodes': 12, 
         'finished_episodes': 0, 
         'image': None
     }
+    
+    # Get anime data if editing
+    if is_edit and 0 <= st.session_state.edit_index < len(st.session_state.anime_collection):
+        anime_data = st.session_state.anime_collection[st.session_state.edit_index]
+    else:
+        anime_data = default_anime
     
     st.markdown(f'<h2 class="section-header">{"✏️ Edit" if is_edit else "➕ Add New"} Anime</h2>', unsafe_allow_html=True)
     st.markdown(f'<div class="category-line"></div>', unsafe_allow_html=True)
@@ -1028,7 +1218,11 @@ def display_add_view():
         with col_img:
             st.markdown('<p style="margin-bottom: 15px; font-size: 1.1rem; font-weight: 500;">Cover Image</p>', unsafe_allow_html=True)
             
+            # Improved image uploader with better error handling
             image_file = st.file_uploader("", type=["png", "jpg", "jpeg"], label_visibility="collapsed")
+            
+            # Variable to store the image for saving
+            anime_image = None
             
             if image_file:
                 try:
@@ -1036,18 +1230,24 @@ def display_add_view():
                     # Compress image to avoid size issues
                     anime_image = compress_image(anime_image_bytes)
                     if anime_image:
+                        # Display the image with enhanced styling
+                        st.markdown('<div class="image-preview">', unsafe_allow_html=True)
                         st.image(anime_image, use_container_width=True)
+                        st.markdown('</div>', unsafe_allow_html=True)
                     else:
                         st.error("Failed to process image. Please try a smaller image.")
-                        anime_image = None
                 except Exception as e:
-                    st.error(f"Error processing image: {e}")
-                    anime_image = None
+                    st.error(f"Error processing image: {str(e)}")
             else:
-                anime_image = anime_data.get('image') if isinstance(anime_data.get('image'), bytes) else None
-                if anime_image:
-                    st.image(anime_image, use_container_width=True)
+                # Use existing image if available
+                existing_image = anime_data.get('image') if isinstance(anime_data.get('image'), bytes) else None
+                if existing_image:
+                    anime_image = existing_image
+                    st.markdown('<div class="image-preview">', unsafe_allow_html=True)
+                    st.image(existing_image, use_container_width=True)
+                    st.markdown('</div>', unsafe_allow_html=True)
                 else:
+                    # Show placeholder
                     st.markdown("""
                     <div class="image-placeholder">
                         <div>📷 No Image Selected</div>
@@ -1060,12 +1260,33 @@ def display_add_view():
             
             col1, col2 = st.columns(2)
             with col1:
-                seasons = st.number_input("Seasons", min_value=1, value=anime_data.get('seasons', 1))
+                # Ensure seasons is an integer
+                try:
+                    seasons_value = int(anime_data.get('seasons', 1))
+                except (ValueError, TypeError):
+                    seasons_value = 1
+                    
+                seasons = st.number_input("Seasons", min_value=1, value=seasons_value)
             with col2:
-                total_episodes = st.number_input("Total Episodes", min_value=1, value=anime_data.get('total_episodes', 12))
+                # Ensure total_episodes is an integer
+                try:
+                    total_episodes_value = int(anime_data.get('total_episodes', 12))
+                except (ValueError, TypeError):
+                    total_episodes_value = 12
+                    
+                total_episodes = st.number_input("Total Episodes", min_value=1, value=total_episodes_value)
             
-            finished_episodes = st.slider("Episodes Watched", 0, total_episodes, anime_data.get('finished_episodes', 0))
+            # Ensure finished_episodes is an integer
+            try:
+                finished_episodes_value = int(anime_data.get('finished_episodes', 0))
+                # Make sure it doesn't exceed total episodes
+                finished_episodes_value = min(finished_episodes_value, total_episodes)
+            except (ValueError, TypeError):
+                finished_episodes_value = 0
+                
+            finished_episodes = st.slider("Episodes Watched", 0, total_episodes, finished_episodes_value)
             
+            # Calculate progress
             progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
             st.markdown(f"""
             <div style="margin-top:25px; margin-bottom:15px; display: flex; justify-content: space-between; align-items: center;">
@@ -1094,9 +1315,10 @@ def display_add_view():
                     'finished_episodes': finished_episodes, 
                     'image': anime_image
                 }
-                save_anime_data(new_anime, st.session_state.edit_index if is_edit else None)
-                st.success(f"Anime {'updated' if is_edit else 'added'} successfully!")
-                st.rerun()
+                
+                if save_anime_data(new_anime, st.session_state.edit_index if is_edit else None):
+                    st.success(f"Anime {'updated' if is_edit else 'added'} successfully!")
+                    st.rerun()
         
         if cancel_btn:
             st.session_state.view = 'home'
@@ -1156,13 +1378,22 @@ def main_page():
     elif st.session_state.view == 'add':
         display_add_view()
 
-# Main app logic
+# Main app logic with improved error handling
 def main():
-    if not st.session_state.logged_in:
-        auth_page()
-    else:
-        load_anime_collection()
-        main_page()
+    try:
+        if not st.session_state.logged_in:
+            # Set default auth mode if not set
+            if not st.session_state.auth_mode:
+                st.session_state.auth_mode = "login"
+            auth_page()
+        else:
+            # Load anime collection with error handling
+            if not st.session_state.anime_collection:
+                load_anime_collection()
+            main_page()
+    except Exception as e:
+        st.error(f"An unexpected error occurred. Please try refreshing the page.")
+        st.error(f"Error details: {str(e)}")
 
 if __name__ == "__main__":
     main()
