@@ -747,15 +747,12 @@ def filter_anime_collection():
     return filtered
 
 def get_status(anime):
-    finished = int(anime.get("finished_episodes") or 0)
-    total    = int(anime.get("total_episodes")   or 0)
-
-    if finished == 0:
-        return "not started"
-    if finished >= total:
-        return "finished"
-    return "watching"
-
+    if anime['finished_episodes'] == 0:
+        return "planned"
+    elif anime['finished_episodes'] >= anime['total_episodes']:
+        return "completed"
+    else:
+        return "watching"
 
 def calculate_progress(anime):
     if anime['total_episodes'] == 0:
@@ -780,36 +777,25 @@ def load_anime_collection():
         else:
             st.session_state.anime_collection = []
 
-import datetime
-
 def save_anime_collection():
-    if not st.session_state.username:
-        return
-
-    serializable = []
-    for anime in st.session_state.anime_collection:
-        clean = {}
-        for k, v in anime.items():
-            # bytes → base64
-            if isinstance(v, (bytes, bytearray)):
+    if st.session_state.username:
+        anime_collection_serializable = []
+        for anime in st.session_state.anime_collection:
+            anime_copy = anime.copy()
+            if isinstance(anime_copy.get('image'), bytes):
                 try:
-                    comp = compress_image(v)
-                    clean[k] = base64.b64encode(comp).decode('utf-8') if comp else ""
+                    compressed_image = compress_image(anime_copy['image'])
+                    if compressed_image:
+                        anime_copy['image'] = base64.b64encode(compressed_image).decode('utf-8')
+                    else:
+                        anime_copy['image'] = ""
                 except:
-                    clean[k] = ""
-            # datetime → iso string
-            elif isinstance(v, datetime.datetime):
-                clean[k] = v.isoformat()
-            # None → empty string, everything else passthrough
-            else:
-                clean[k] = v or ""
-        serializable.append(clean)
-
-    db.collection("users") \
-      .document(st.session_state.username) \
-      .set({"anime_collection": serializable})
-
-
+                    anime_copy['image'] = ""
+            elif anime_copy.get('image') is None:
+                anime_copy['image'] = ""
+            anime_collection_serializable.append(anime_copy)
+        doc_ref = db.collection("users").document(st.session_state.username)
+        doc_ref.set({"anime_collection": anime_collection_serializable})
 
 def save_anime_data(anime_data, edit_index=None):
     if edit_index is not None:
