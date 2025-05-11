@@ -747,12 +747,15 @@ def filter_anime_collection():
     return filtered
 
 def get_status(anime):
-    if anime['finished_episodes'] == 0:
-        return "planned"
-    elif anime['finished_episodes'] >= anime['total_episodes']:
-        return "completed"
-    else:
-        return "watching"
+    finished = int(anime.get("finished_episodes") or 0)
+    total    = int(anime.get("total_episodes")   or 0)
+
+    if finished == 0:
+        return "not started"
+    if finished >= total:
+        return "finished"
+    return "watching"
+
 
 def calculate_progress(anime):
     if anime['total_episodes'] == 0:
