@@ -4,17 +4,6 @@ from PIL import Image
 import base64
 import time
 import io
-import firebase_admin
-from firebase_admin import storage
-import uuid
-
-# Initialize Firebase Storage
-if not firebase_admin._apps:
-    # This should already be initialized in your firebase_config
-    pass
-
-# Get storage bucket
-bucket = storage.bucket()
 
 # Session state initialization
 if 'logged_in' not in st.session_state:
@@ -40,14 +29,12 @@ if 'last_action_time' not in st.session_state:
 if 'pending_action' not in st.session_state:
     st.session_state.pending_action = None
 
-# Page configuration
 st.set_page_config(
     page_title="Anime Tracker", 
     page_icon="🎬", 
     layout="wide", 
     initial_sidebar_state="collapsed")
 
-# Enhanced CSS with improved hover effects and spacing
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
@@ -79,7 +66,6 @@ st.markdown("""
     font-family: 'Poppins', sans-serif;
 }
 
-/* Enhanced Header Styles */
 .page-title {
     font-size: 4rem;
     font-weight: 800;
@@ -131,7 +117,6 @@ st.markdown("""
     width: 100%;
 }
 
-/* Enhanced category line styling with animation */
 .category-line {
     display: block;
     width: 100%;
@@ -178,7 +163,6 @@ st.markdown("""
     border-bottom: 1px solid var(--border);
 }
 
-/* Improved Anime Card Styles with increased spacing */
 .anime-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -290,7 +274,6 @@ st.markdown("""
     transition: width 0.8s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-/* Enhanced Button Styles with new hover effects */
 .action-buttons {
     display: flex;
     gap: 15px;
@@ -315,7 +298,6 @@ st.markdown("""
     color: white;
 }
 
-/* Edit button */
 div[data-testid="stHorizontalBlock"] > div:nth-child(1) .stButton > button {
     background-color: var(--primary-dark);
     color: white;
@@ -327,7 +309,6 @@ div[data-testid="stHorizontalBlock"] > div:nth-child(1) .stButton > button:hover
     box-shadow: 0 6px 12px rgba(138, 79, 255, 0.3);
 }
 
-/* Delete button */
 div[data-testid="stHorizontalBlock"] > div:nth-child(2) .stButton > button {
     background-color: var(--secondary-dark);
     color: white;
@@ -339,7 +320,6 @@ div[data-testid="stHorizontalBlock"] > div:nth-child(2) .stButton > button:hover
     box-shadow: 0 6px 12px rgba(79, 157, 255, 0.3);
 }
 
-/* Login/Signup buttons */
 div[data-testid="stHorizontalBlock"] .stButton > button {
     background-color: var(--bg-input);
     color: var(--text-light);
@@ -352,7 +332,6 @@ div[data-testid="stHorizontalBlock"] .stButton > button:hover {
     box-shadow: 0 6px 12px rgba(138, 79, 255, 0.3);
 }
 
-/* Form submit buttons */
 form .stButton > button {
     background-color: var(--primary-dark);
     color: white;
@@ -364,7 +343,6 @@ form .stButton > button:hover {
     box-shadow: 0 6px 12px rgba(138, 79, 255, 0.3);
 }
 
-/* Enhanced Form Styles */
 .stTextInput > div > div > input, .stNumberInput > div > div > input {
     background-color: var(--bg-input);
     border: 1px solid var(--border);
@@ -381,7 +359,6 @@ form .stButton > button:hover {
     transform: translateY(-2px);
 }
 
-/* Enhanced Auth Styles */
 .auth-container {
     max-width: 550px;
     margin: 50px auto;
@@ -420,7 +397,6 @@ form .stButton > button:hover {
     background-color: var(--primary);
 }
 
-/* Enhanced Search Bar */
 .search-container {
     position: relative;
     margin-bottom: 25px;
@@ -445,7 +421,6 @@ form .stButton > button:hover {
     transform: translateY(-2px);
 }
 
-/* Enhanced User Menu */
 .user-menu {
     position: absolute;
     right: 25px;
@@ -494,7 +469,6 @@ form .stButton > button:hover {
     transform: translateY(-2px);
 }
 
-/* Enhanced Add Button */
 .add-button {
     background: linear-gradient(45deg, var(--primary), var(--primary-light));
     color: white;
@@ -526,7 +500,6 @@ form .stButton > button:hover {
     transform: rotate(90deg);
 }
 
-/* Enhanced Empty State */
 .empty-state {
     text-align: center;
     padding: 60px 30px;
@@ -556,7 +529,6 @@ form .stButton > button:hover {
     font-size: 1.1rem;
 }
 
-/* Enhanced Category Labels */
 .category-label {
     display: inline-block;
     padding: 6px 14px;
@@ -576,7 +548,6 @@ form .stButton > button:hover {
     box-shadow: 0 6px 12px rgba(138, 79, 255, 0.4);
 }
 
-/* Responsive Adjustments */
 @media (max-width: 768px) {
     .page-title {
         font-size: 3rem;
@@ -622,7 +593,6 @@ form .stButton > button:hover {
     }
 }
 
-/* Image placeholder with animation */
 .image-placeholder {
     height: 240px;
     background-color: #000000;
@@ -658,7 +628,6 @@ form .stButton > button:hover {
     }
 }
 
-/* Loading animation */
 .loading {
     display: inline-block;
     width: 24px;
@@ -673,12 +642,10 @@ form .stButton > button:hover {
     to { transform: rotate(360deg); }
 }
 
-/* Hide Streamlit elements */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 .stDeployButton {display:none;}
 
-/* Custom file uploader */
 .stFileUploader > div > button {
     background-color: var(--primary);
     color: white;
@@ -692,17 +659,14 @@ footer {visibility: hidden;}
     box-shadow: 0 4px 8px rgba(138, 79, 255, 0.3);
 }
 
-/* Custom slider */
 .stSlider > div > div > div > div {
     background-color: var(--primary);
 }
 
-/* Custom progress bar */
 .stProgress > div > div > div > div {
     background: linear-gradient(90deg, var(--primary), var(--secondary));
 }
 
-/* Image upload preview */
 .image-preview {
     width: 100%;
     border-radius: 12px;
@@ -716,7 +680,6 @@ footer {visibility: hidden;}
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-/* Upload button enhancement */
 .upload-container {
     position: relative;
     width: 100%;
@@ -752,59 +715,96 @@ footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# Helper functions
-def upload_image_to_storage(image_bytes, filename):
-    """Upload image to Firebase Storage and return the download URL"""
-    try:
-        # Generate unique filename
-        unique_filename = f"anime_images/{st.session_state.username}/{uuid.uuid4()}_{filename}"
-        
-        # Create blob and upload
-        blob = bucket.blob(unique_filename)
-        blob.upload_from_string(image_bytes, content_type='image/jpeg')
-        
-        # Make the blob publicly accessible
-        blob.make_public()
-        
-        # Return the public URL
-        return blob.public_url
-    except Exception as e:
-        st.error(f"Error uploading image: {e}")
-        return None
-
-def compress_image(image_bytes, max_size_mb=5):
-    """Compress image to reduce size"""
+def compress_image(image_bytes, max_size_kb=800):
     try:
         img = Image.open(io.BytesIO(image_bytes))
         
-        # Calculate current size in MB
-        current_size_mb = len(image_bytes) / (1024 * 1024)
-        
-        if current_size_mb <= max_size_mb:
-            return image_bytes
-        
-        # Calculate compression quality based on size
-        quality = int(85 * (max_size_mb / current_size_mb))
-        quality = max(10, min(quality, 80))  # Keep quality between 10 and 80
-        
-        # Resize if image is very large
-        max_dimension = 1000
-        if max(img.size) > max_dimension:
-            ratio = max_dimension / max(img.size)
-            new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
-            img = img.resize(new_size, Image.LANCZOS)
-        
-        # Convert to RGB if RGBA
-        if img.mode == 'RGBA':
-            img = img.convert('RGB')
+        quality = 95
+        while quality > 10:
+            output = io.BytesIO()
             
-        # Save with compression
-        output = io.BytesIO()
-        img.save(output, format='JPEG', quality=quality, optimize=True)
-        return output.getvalue()
+            if img.mode == 'RGBA':
+                img = img.convert('RGB')
+            
+            max_dimension = 800
+            if max(img.size) > max_dimension:
+                ratio = max_dimension / max(img.size)
+                new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
+                img = img.resize(new_size, Image.LANCZOS)
+            
+            img.save(output, format='JPEG', quality=quality, optimize=True)
+            compressed_bytes = output.getvalue()
+            
+            if len(compressed_bytes) <= max_size_kb * 1024:
+                return compressed_bytes
+            
+            quality -= 10
+            
+        return compressed_bytes
     except Exception as e:
         st.error(f"Error compressing image: {e}")
         return None
+
+def save_anime_in_chunks(username, anime_collection):
+    try:
+        chunk_size = 10
+        chunks = [anime_collection[i:i + chunk_size] for i in range(0, len(anime_collection), chunk_size)]
+        
+        batch = db.batch()
+        
+        for i, chunk in enumerate(chunks):
+            doc_ref = db.collection("users").document(f"{username}_chunk_{i}")
+            batch.set(doc_ref, {"anime_collection": chunk})
+        
+        for i in range(len(chunks), 50):
+            doc_ref = db.collection("users").document(f"{username}_chunk_{i}")
+            batch.delete(doc_ref)
+        
+        batch.commit()
+        return True
+    except Exception as e:
+        st.error(f"Error saving anime collection: {e}")
+        return False
+
+def load_anime_from_chunks(username):
+    try:
+        anime_collection = []
+        i = 0
+        while i < 50:
+            doc_ref = db.collection("users").document(f"{username}_chunk_{i}")
+            doc = doc_ref.get()
+            if hasattr(doc, 'exists') and doc.exists:
+                chunk_data = doc.to_dict().get("anime_collection", [])
+                anime_collection.extend(chunk_data)
+                i += 1
+            else:
+                break
+        
+        for anime in anime_collection:
+            if not isinstance(anime, dict):
+                continue
+            
+            if 'anime_name' not in anime:
+                anime['anime_name'] = 'Untitled Anime'
+            if 'seasons' not in anime:
+                anime['seasons'] = 1
+            if 'total_episodes' not in anime:
+                anime['total_episodes'] = 12
+            if 'finished_episodes' not in anime:
+                anime['finished_episodes'] = 0
+            
+            if isinstance(anime.get('image'), str) and anime['image']:
+                try:
+                    anime['image'] = base64.b64decode(anime['image'])
+                except:
+                    anime['image'] = None
+            else:
+                anime['image'] = None
+        
+        return anime_collection
+    except Exception as e:
+        st.error(f"Error loading anime collection: {e}")
+        return []
 
 def handle_action(action_name, callback_func, *args, **kwargs):
     current_time = time.time()
@@ -847,88 +847,57 @@ def calculate_progress(anime):
 
 def load_anime_collection():
     if st.session_state.username:
-        try:
-            doc_ref = db.collection("users").document(st.session_state.username)
-            doc = doc_ref.get()
-            if hasattr(doc, 'exists') and doc.exists:
-                anime_collection = doc.to_dict().get("anime_collection", [])
-                for anime in anime_collection:
-                    if not isinstance(anime, dict):
-                        continue
-                    
-                    # Set default values for missing fields
-                    if 'anime_name' not in anime:
-                        anime['anime_name'] = 'Untitled Anime'
-                    if 'seasons' not in anime:
-                        anime['seasons'] = 1
-                    if 'total_episodes' not in anime:
-                        anime['total_episodes'] = 12
-                    if 'finished_episodes' not in anime:
-                        anime['finished_episodes'] = 0
-                    
-                    # Handle image URL (no more base64 conversion needed)
-                    if 'image_url' not in anime:
-                        anime['image_url'] = None
-                
-                st.session_state.anime_collection = anime_collection
-            else:
-                st.session_state.anime_collection = []
-        except Exception as e:
-            st.error(f"Error loading anime collection: {e}")
-            st.session_state.anime_collection = []
+        st.session_state.anime_collection = load_anime_from_chunks(st.session_state.username)
 
 def save_anime_collection():
     if st.session_state.username:
-        try:
-            anime_collection_serializable = []
-            for anime in st.session_state.anime_collection:
-                if not isinstance(anime, dict):
-                    continue
-                
-                anime_copy = anime.copy()
-                
-                # Ensure all required fields exist
-                if 'anime_name' not in anime_copy:
-                    anime_copy['anime_name'] = 'Untitled Anime'
-                if 'seasons' not in anime_copy:
-                    anime_copy['seasons'] = 1
-                if 'total_episodes' not in anime_copy:
-                    anime_copy['total_episodes'] = 12
-                if 'finished_episodes' not in anime_copy:
-                    anime_copy['finished_episodes'] = 0
-                
-                # Handle image URL (much smaller than base64)
-                if 'image_url' not in anime_copy:
-                    anime_copy['image_url'] = None
-                
-                anime_collection_serializable.append(anime_copy)
+        anime_collection_serializable = []
+        for anime in st.session_state.anime_collection:
+            if not isinstance(anime, dict):
+                continue
             
-            doc_ref = db.collection("users").document(st.session_state.username)
-            doc_ref.set({"anime_collection": anime_collection_serializable})
-            return True
-        except Exception as e:
-            st.error(f"Error saving anime collection: {e}")
-            return False
+            anime_copy = anime.copy()
+            
+            if 'anime_name' not in anime_copy:
+                anime_copy['anime_name'] = 'Untitled Anime'
+            if 'seasons' not in anime_copy:
+                anime_copy['seasons'] = 1
+            if 'total_episodes' not in anime_copy:
+                anime_copy['total_episodes'] = 12
+            if 'finished_episodes' not in anime_copy:
+                anime_copy['finished_episodes'] = 0
+            
+            if isinstance(anime_copy.get('image'), bytes):
+                try:
+                    compressed_image = compress_image(anime_copy['image'])
+                    if compressed_image:
+                        anime_copy['image'] = base64.b64encode(compressed_image).decode('utf-8')
+                    else:
+                        anime_copy['image'] = ""
+                except:
+                    anime_copy['image'] = ""
+            elif anime_copy.get('image') is None:
+                anime_copy['image'] = ""
+            
+            anime_collection_serializable.append(anime_copy)
+        
+        return save_anime_in_chunks(st.session_state.username, anime_collection_serializable)
 
 def save_anime_data(anime_data, edit_index=None):
     try:
-        # Validate data
         if not anime_data.get('anime_name'):
             st.error("Anime name is required")
             return False
         
-        # Ensure numeric fields are integers
         anime_data['seasons'] = int(anime_data.get('seasons', 1))
         anime_data['total_episodes'] = int(anime_data.get('total_episodes', 12))
         anime_data['finished_episodes'] = int(anime_data.get('finished_episodes', 0))
         
-        # Update or add the anime
         if edit_index is not None and 0 <= edit_index < len(st.session_state.anime_collection):
             st.session_state.anime_collection[edit_index] = anime_data
         else:
             st.session_state.anime_collection.append(anime_data)
         
-        # Save to database
         if save_anime_collection():
             st.session_state.view = 'home'
             st.session_state.edit_index = None
@@ -966,39 +935,28 @@ def set_view(view_name, **kwargs):
         if key in st.session_state:
             st.session_state[key] = value
 
-# Enhanced Authentication page
 def auth_page():
     st.markdown('<div class="auth-container">', unsafe_allow_html=True)
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
     
-    # Tabs for login/signup with enhanced styling
     col1, col2 = st.columns(2)
     
     with col1:
-        login_btn_style = "auth-tab active" if st.session_state.auth_mode == "login" else "auth-tab"
-        if st.button("Login", key="login_tab_btn", use_container_width=True,
-                     help="Login with your existing account"):
+        if st.button("Login", key="login_tab_btn", use_container_width=True):
             st.session_state.auth_mode = "login"
     
     with col2:
-        signup_btn_style = "auth-tab active" if st.session_state.auth_mode == "signup" else "auth-tab"
-        if st.button("Sign Up", key="signup_tab_btn", use_container_width=True,
-                    help="Create a new account"):
+        if st.button("Sign Up", key="signup_tab_btn", use_container_width=True):
             st.session_state.auth_mode = "signup"
     
     st.markdown('<div style="margin: 25px 0; border-bottom: 1px solid #333;"></div>', unsafe_allow_html=True)
     
-    # Login form with enhanced styling
     if st.session_state.auth_mode == "login":
         st.markdown('<h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem; background: linear-gradient(90deg, #8A4FFF, #4F9DFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Welcome Back!</h3>', unsafe_allow_html=True)
-        login_username = st.text_input("Username", key="login_username",
-                                      placeholder="Enter your username")
-        login_password = st.text_input("Password", type="password", key="login_password",
-                                     placeholder="Enter your password")
+        login_username = st.text_input("Username", key="login_username", placeholder="Enter your username")
+        login_password = st.text_input("Password", type="password", key="login_password", placeholder="Enter your password")
         
-        login_btn = st.button("Login", key="submit_login", use_container_width=True)
-        
-        if login_btn:
+        if st.button("Login", key="submit_login", use_container_width=True):
             if login_username and login_password:
                 with st.spinner("Logging in..."):
                     time.sleep(0.5)
@@ -1009,19 +967,13 @@ def auth_page():
             else:
                 st.error("Please enter both username and password")
 
-    # Signup form with enhanced styling
     elif st.session_state.auth_mode == "signup":
         st.markdown('<h3 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem; background: linear-gradient(90deg, #8A4FFF, #4F9DFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Create Your Account</h3>', unsafe_allow_html=True)
-        signup_username = st.text_input("Username", key="signup_username",
-                                       placeholder="Choose a username")
-        signup_password = st.text_input("Password", type="password", key="signup_password",
-                                      placeholder="Create a password")
-        signup_confirm = st.text_input("Confirm Password", type="password", key="signup_confirm",
-                                     placeholder="Confirm your password")
+        signup_username = st.text_input("Username", key="signup_username", placeholder="Choose a username")
+        signup_password = st.text_input("Password", type="password", key="signup_password", placeholder="Create a password")
+        signup_confirm = st.text_input("Confirm Password", type="password", key="signup_confirm", placeholder="Confirm your password")
         
-        signup_btn = st.button("Create Account", key="submit_signup", use_container_width=True)
-        
-        if signup_btn:
+        if st.button("Create Account", key="submit_signup", use_container_width=True):
             if not signup_username:
                 st.error("Please enter a username")
             elif not signup_password:
@@ -1039,19 +991,25 @@ def auth_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Enhanced anime card rendering with increased spacing
 def render_anime_card(index, anime):
     progress = calculate_progress(anime)
     status = get_status(anime)
     status_text = {"watching": "Watching", "completed": "Completed", "planned": "Planned"}[status]
     
-    # Use image URL from Firebase Storage
-    image_url = anime.get('image_url', '')
+    image_url = None
     
-    # Create the anime card with enhanced spacing
+    if anime.get('image'):
+        try:
+            image_bytes = anime['image']
+            if isinstance(image_bytes, bytes):
+                image_b64 = base64.b64encode(image_bytes).decode()
+                image_url = f"data:image/jpeg;base64,{image_b64}"
+        except:
+            pass
+    
     card_html = f"""
     <div class="anime-card">
-        <div class="anime-image" style="background-image: url('{image_url}'); background-color: #000000;">
+        <div class="anime-image" style="background-image: url('{image_url if image_url else ""}'); background-color: #000000;">
             <div class="status-badge status-{status}">{status_text}</div>
         </div>
         <div class="anime-card-content">
@@ -1071,27 +1029,22 @@ def render_anime_card(index, anime):
     """
     st.markdown(card_html, unsafe_allow_html=True)
     
-    # Enhanced action buttons with icons and better spacing
     col1, col2 = st.columns(2)
     with col1:
         st.button("✏️ Edit", key=f"edit_{index}",
                  on_click=lambda: handle_action(f"edit_{index}", set_view, 'add', edit_index=index),
-                 use_container_width=True,
-                help="Edit this anime entry")
+                 use_container_width=True)
     with col2:
         st.button("🗑️ Delete", key=f"delete_{index}",
                  on_click=lambda: handle_action(f"delete_{index}", delete_anime, index),
-                 use_container_width=True,
-                help="Delete this anime from your collection")
+                 use_container_width=True)
 
-# Display anime sections with enhanced category styling
 def display_section(title, anime_list):
     if not anime_list:
         return
     
     st.markdown(f'<div class="section-container">', unsafe_allow_html=True)
     
-    # Enhanced section header with category styling
     category_icon = {
         "Currently Watching": "📺",
         "Planned to Watch": "📝",
@@ -1099,11 +1052,8 @@ def display_section(title, anime_list):
     }.get(title, "")
     
     st.markdown(f'<h2 class="section-header">{category_icon} {title}</h2>', unsafe_allow_html=True)
-    
-    # Add category line effect with animation
     st.markdown(f'<div class="category-line"></div>', unsafe_allow_html=True)
     
-    # Create a responsive grid layout with better spacing
     cols = st.columns(2)
     for i, (idx, anime) in enumerate(anime_list):
         with cols[i % 2]:
@@ -1111,7 +1061,6 @@ def display_section(title, anime_list):
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Enhanced home view
 def display_home_view():
     filtered = filter_anime_collection()
     
@@ -1127,30 +1076,25 @@ def display_home_view():
             handle_action("add_first", set_view, 'add', edit_index=None)
         return
     
-    # Filter by status
     watching = [pair for pair in filtered if get_status(pair[1]) == "watching"]
     planned = [pair for pair in filtered if get_status(pair[1]) == "planned"]
     completed = [pair for pair in filtered if get_status(pair[1]) == "completed"]
     
-    # Display sections with enhanced spacing
     display_section("Currently Watching", watching)
     display_section("Planned to Watch", planned)
     display_section("Completed", completed)
 
-# Enhanced Add/Edit anime view with Firebase Storage
 def display_add_view():
     is_edit = st.session_state.edit_index is not None
     
-    # Initialize default anime data
     default_anime = {
         'anime_name': '', 
         'seasons': 1, 
         'total_episodes': 12, 
         'finished_episodes': 0, 
-        'image_url': None
+        'image': None
     }
     
-    # Get anime data if editing
     if is_edit and 0 <= st.session_state.edit_index < len(st.session_state.anime_collection):
         anime_data = st.session_state.anime_collection[st.session_state.edit_index]
     else:
@@ -1165,44 +1109,30 @@ def display_add_view():
         with col_img:
             st.markdown('<p style="margin-bottom: 15px; font-size: 1.1rem; font-weight: 500;">Cover Image</p>', unsafe_allow_html=True)
             
-            # Image uploader
             image_file = st.file_uploader("", type=["png", "jpg", "jpeg"], label_visibility="collapsed")
             
-            # Variable to store the image URL for saving
-            anime_image_url = anime_data.get('image_url')
+            anime_image = None
             
             if image_file:
                 try:
-                    # Read and compress the image
                     anime_image_bytes = image_file.read()
-                    compressed_image = compress_image(anime_image_bytes)
-                    
-                    if compressed_image:
-                        # Upload to Firebase Storage
-                        with st.spinner("Uploading image..."):
-                            image_url = upload_image_to_storage(compressed_image, image_file.name)
-                        
-                        if image_url:
-                            anime_image_url = image_url
-                            # Display the uploaded image
-                            st.markdown('<div class="image-preview">', unsafe_allow_html=True)
-                            st.image(image_url, use_container_width=True)
-                            st.markdown('</div>', unsafe_allow_html=True)
-                            st.success("Image uploaded successfully!")
-                        else:
-                            st.error("Failed to upload image. Please try again.")
+                    anime_image = compress_image(anime_image_bytes)
+                    if anime_image:
+                        st.markdown('<div class="image-preview">', unsafe_allow_html=True)
+                        st.image(anime_image, use_container_width=True)
+                        st.markdown('</div>', unsafe_allow_html=True)
                     else:
                         st.error("Failed to process image. Please try a smaller image.")
                 except Exception as e:
                     st.error(f"Error processing image: {str(e)}")
             else:
-                # Show existing image if available
-                if anime_image_url:
+                existing_image = anime_data.get('image') if isinstance(anime_data.get('image'), bytes) else None
+                if existing_image:
+                    anime_image = existing_image
                     st.markdown('<div class="image-preview">', unsafe_allow_html=True)
-                    st.image(anime_image_url, use_container_width=True)
+                    st.image(existing_image, use_container_width=True)
                     st.markdown('</div>', unsafe_allow_html=True)
                 else:
-                    # Show placeholder
                     st.markdown("""
                     <div class="image-placeholder">
                         <div>📷 No Image Selected</div>
@@ -1210,8 +1140,7 @@ def display_add_view():
                     """, unsafe_allow_html=True)
         
         with col_form:
-            anime_name = st.text_input("Anime Name", value=anime_data.get('anime_name', ''),
-                                     placeholder="Enter anime name")
+            anime_name = st.text_input("Anime Name", value=anime_data.get('anime_name', ''), placeholder="Enter anime name")
             
             col1, col2 = st.columns(2)
             with col1:
@@ -1238,7 +1167,6 @@ def display_add_view():
             
             finished_episodes = st.slider("Episodes Watched", 0, total_episodes, finished_episodes_value)
             
-            # Calculate progress
             progress = (finished_episodes / total_episodes) * 100 if total_episodes > 0 else 0
             st.markdown(f"""
             <div style="margin-top:25px; margin-bottom:15px; display: flex; justify-content: space-between; align-items: center;">
@@ -1249,7 +1177,6 @@ def display_add_view():
             
             st.progress(progress/100.0)
         
-        # Enhanced form buttons
         col_save, col_cancel = st.columns(2)
         with col_save:
             save_btn = st.form_submit_button("💾 Save Anime", use_container_width=True)
@@ -1265,7 +1192,7 @@ def display_add_view():
                     'seasons': seasons, 
                     'total_episodes': total_episodes, 
                     'finished_episodes': finished_episodes, 
-                    'image_url': anime_image_url
+                    'image': anime_image
                 }
                 
                 if save_anime_data(new_anime, st.session_state.edit_index if is_edit else None):
@@ -1277,34 +1204,24 @@ def display_add_view():
             st.session_state.edit_index = None
             st.rerun()
 
-# Enhanced header with search and user menu
 def display_header():
     col1, col2, col3 = st.columns([6, 1, 1])
     
     with col1:
-        # Enhanced search input with icon
         search = st.text_input("", value=st.session_state.search_query,
                               placeholder="🔍 Search your anime collection...",
                               key="search_input",
-                              on_change=lambda: handle_action("search", lambda: None),
-                             label_visibility="collapsed")
-        
-        # Update search query in session state
+                              label_visibility="collapsed")
         st.session_state.search_query = search
     
     with col2:
-        # Enhanced add new anime button
-        if st.button("➕ Add", key="add_button", use_container_width=True,
-                   help="Add a new anime to your collection"):
+        if st.button("➕ Add", key="add_button", use_container_width=True):
             handle_action("add_new", set_view, 'add', edit_index=None)
     
     with col3:
-        # Enhanced user menu button
-        if st.button(f"👤", key="user_button", use_container_width=True,
-                   help=f"Logged in as {st.session_state.username}"):
+        if st.button(f"👤", key="user_button", use_container_width=True):
             st.session_state.user_menu_visible = not st.session_state.user_menu_visible
     
-    # Enhanced user menu dropdown
     if st.session_state.user_menu_visible:
         st.markdown(f"""
         <div class="user-menu">
@@ -1320,7 +1237,6 @@ def display_header():
         if st.button("Logout", key="logout_button", use_container_width=True):
             handle_action("logout", logout)
 
-# Enhanced main page with header and content
 def main_page():
     st.markdown('<h1 class="page-title">Anime Tracker</h1>', unsafe_allow_html=True)
     display_header()
@@ -1330,16 +1246,13 @@ def main_page():
     elif st.session_state.view == 'add':
         display_add_view()
 
-# Main app logic with improved error handling
 def main():
     try:
         if not st.session_state.logged_in:
-            # Set default auth mode if not set
             if not st.session_state.auth_mode:
                 st.session_state.auth_mode = "login"
             auth_page()
         else:
-            # Load anime collection with error handling
             if not st.session_state.anime_collection:
                 load_anime_collection()
             main_page()
