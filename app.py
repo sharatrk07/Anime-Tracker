@@ -5,7 +5,6 @@ import base64
 import time
 import io
 
-
 # Session state initialization
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
