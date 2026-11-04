@@ -38,7 +38,6 @@ st.set_page_config(
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-
 :root {
     --primary: #8A4FFF;
     --primary-light: #9D6FFF;
