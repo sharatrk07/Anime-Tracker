@@ -147,6 +147,7 @@ st.markdown("""
         rgba(255, 255, 255, 0.3) 50%,
         rgba(255, 255, 255, 0) 100%
     );
+    
     animation: shimmer 3s infinite;
 }
 
